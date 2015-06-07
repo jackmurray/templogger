@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="temperaturelogModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="temperaturelogModelStoreContainer">
+          <EntitySet Name="device" EntityType="temperaturelogModel.Store.device" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="temperature" EntityType="temperaturelogModel.Store.temperature" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_temperature_device" Association="temperaturelogModel.Store.FK_temperature_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="temperature" EntitySet="temperature" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="device">
+          <Key>
+            <PropertyRef Name="deviceID" />
+          </Key>
+          <Property Name="deviceID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="deviceName" Type="varchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="temperature">
+          <Key>
+            <PropertyRef Name="deviceID" />
+            <PropertyRef Name="timestamp" />
+          </Key>
+          <Property Name="deviceID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="timestamp" Type="datetime2" Nullable="false" />
+          <Property Name="value" Type="decimal" Nullable="false" Scale="3" />
+        </EntityType>
+        <Association Name="FK_temperature_device">
+          <End Role="device" Type="temperaturelogModel.Store.device" Multiplicity="1" />
+          <End Role="temperature" Type="temperaturelogModel.Store.temperature" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="deviceID" />
+            </Principal>
+            <Dependent Role="temperature">
+              <PropertyRef Name="deviceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="GetTempRange" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="device" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="start" Type="datetime2" Mode="In" />
+          <Parameter Name="end" Type="datetime2" Mode="In" />
+        </Function>
+        <Function Name="GetTempsLast24Hours" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="device" Type="uniqueidentifier" Mode="In" />
+        </Function>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="temperaturelogModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="temperaturelogEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="devices" EntityType="temperaturelogModel.device" />
+          <EntitySet Name="temperatures" EntityType="temperaturelogModel.temperature" />
+          <AssociationSet Name="FK_temperature_device" Association="temperaturelogModel.FK_temperature_device">
+            <End Role="device" EntitySet="devices" />
+            <End Role="temperature" EntitySet="temperatures" />
+          </AssociationSet>
+          <FunctionImport Name="GetTempRange" ReturnType="Collection(temperaturelogModel.GetTempRange_Result)">
+            <Parameter Name="device" Mode="In" Type="Guid" />
+            <Parameter Name="start" Mode="In" Type="DateTime" />
+            <Parameter Name="end" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="GetTempsLast24Hours" ReturnType="Collection(temperaturelogModel.GetTempRange_Result)">
+          <Parameter Name="device" Mode="In" Type="Guid" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="device">
+          <Key>
+            <PropertyRef Name="deviceID" />
+          </Key>
+          <Property Name="deviceID" Type="Guid" Nullable="false" />
+          <Property Name="deviceName" Type="String" Nullable="false" MaxLength="Max" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="temperatures" Relationship="temperaturelogModel.FK_temperature_device" FromRole="device" ToRole="temperature" />
+        </EntityType>
+        <EntityType Name="temperature">
+          <Key>
+            <PropertyRef Name="deviceID" />
+            <PropertyRef Name="timestamp" />
+          </Key>
+          <Property Name="deviceID" Type="Guid" Nullable="false" />
+          <Property Name="timestamp" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="value" Type="Decimal" Nullable="false" Precision="18" Scale="3" />
+          <NavigationProperty Name="device" Relationship="temperaturelogModel.FK_temperature_device" FromRole="temperature" ToRole="device" />
+        </EntityType>
+        <Association Name="FK_temperature_device">
+          <End Type="temperaturelogModel.device" Role="device" Multiplicity="1" />
+          <End Type="temperaturelogModel.temperature" Role="temperature" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="deviceID" />
+            </Principal>
+            <Dependent Role="temperature">
+              <PropertyRef Name="deviceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="GetTempRange_Result">
+          <Property Type="Int32" Name="h" Nullable="true" />
+          <Property Type="Decimal" Name="avgtemp" Nullable="true" Precision="38" Scale="6" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="temperaturelogModelStoreContainer" CdmEntityContainer="temperaturelogEntities">
+          <EntitySetMapping Name="devices">
+            <EntityTypeMapping TypeName="temperaturelogModel.device">
+              <MappingFragment StoreEntitySet="device">
+                <ScalarProperty Name="deviceID" ColumnName="deviceID" />
+                <ScalarProperty Name="deviceName" ColumnName="deviceName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="temperatures">
+            <EntityTypeMapping TypeName="temperaturelogModel.temperature">
+              <MappingFragment StoreEntitySet="temperature">
+                <ScalarProperty Name="deviceID" ColumnName="deviceID" />
+                <ScalarProperty Name="timestamp" ColumnName="timestamp" />
+                <ScalarProperty Name="value" ColumnName="value" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetTempRange" FunctionName="temperaturelogModel.Store.GetTempRange">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="temperaturelogModel.GetTempRange_Result">
+                <ScalarProperty Name="h" ColumnName="h" />
+                <ScalarProperty Name="avgtemp" ColumnName="avgtemp" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetTempsLast24Hours" FunctionName="temperaturelogModel.Store.GetTempsLast24Hours">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="temperaturelogModel.GetTempRange_Result">
+                <ScalarProperty Name="h" ColumnName="h" />
+                <ScalarProperty Name="avgtemp" ColumnName="avgtemp" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
