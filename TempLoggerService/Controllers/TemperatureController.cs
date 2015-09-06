@@ -35,6 +35,20 @@ namespace TempLoggerService.Controllers
                 select new AverageTempModel() {hour = (int) i.h, avgtemp = (decimal) i.avgtemp}).ToList();
         }
 
+        public List<TempEntry> GetLastTemps(Guid id)
+        {
+            temperaturelogEntities ent = new temperaturelogEntities();
+            string value = Request.GetQueryNameValuePairs().FirstOrDefault(k => k.Key == "count").Value;
+            int count = (!String.IsNullOrEmpty(value) ? int.Parse(value) : 10);
+            var res = (from e in ent.temperatures
+                where e.deviceID == id
+                orderby e.timestamp descending
+                select e).Take(count);
+
+            return (from e in res
+                select new TempEntry() {device = id, temp = e.value, timestamp = e.timestamp}).ToList();
+        }
+
         // POST api/values
         public void LogTemp(TempEntry entry)
         {
