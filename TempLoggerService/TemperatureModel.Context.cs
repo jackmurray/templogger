@@ -56,5 +56,14 @@ namespace TempLoggerService
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetTempRange_Result>("GetTempsLast24Hours", deviceParameter);
         }
+    
+        public virtual ObjectResult<GetLatestTemp_Result> GetLatestTemp(Nullable<System.Guid> deviceID)
+        {
+            var deviceIDParameter = deviceID.HasValue ?
+                new ObjectParameter("deviceID", deviceID) :
+                new ObjectParameter("deviceID", typeof(System.Guid));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetLatestTemp_Result>("GetLatestTemp", deviceIDParameter);
+        }
     }
 }

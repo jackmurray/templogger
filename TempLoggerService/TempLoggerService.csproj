@@ -159,6 +159,9 @@
     <Compile Include="device.cs">
       <DependentUpon>TemperatureModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="GetLatestTemp_Result.cs">
+      <DependentUpon>TemperatureModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="GetTempRange_Result.cs">
       <DependentUpon>TemperatureModel.tt</DependentUpon>
     </Compile>

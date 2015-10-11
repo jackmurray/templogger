@@ -41,6 +41,9 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="GetLatestTemp" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="deviceID" Type="uniqueidentifier" Mode="In" />
+        </Function>
         <Function Name="GetTempRange" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="device" Type="uniqueidentifier" Mode="In" />
           <Parameter Name="start" Type="datetime2" Mode="In" />
@@ -67,6 +70,9 @@
           </FunctionImport>
           <FunctionImport Name="GetTempsLast24Hours" ReturnType="Collection(temperaturelogModel.GetTempRange_Result)">
           <Parameter Name="device" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="GetLatestTemp" ReturnType="Collection(temperaturelogModel.GetLatestTemp_Result)">
+            <Parameter Name="deviceID" Mode="In" Type="Guid" />
           </FunctionImport>
         </EntityContainer>
         <EntityType Name="device">
@@ -102,6 +108,11 @@
         <ComplexType Name="GetTempRange_Result">
           <Property Type="Int32" Name="h" Nullable="true" />
           <Property Type="Decimal" Name="avgtemp" Nullable="true" Precision="38" Scale="6" />
+        </ComplexType>
+        <ComplexType Name="GetLatestTemp_Result">
+          <Property Type="Guid" Name="deviceID" Nullable="false" />
+          <Property Type="DateTime" Name="timestamp" Nullable="false" />
+          <Property Type="Decimal" Name="value" Nullable="false" Precision="18" Scale="3" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -139,6 +150,15 @@
               <ComplexTypeMapping TypeName="temperaturelogModel.GetTempRange_Result">
                 <ScalarProperty Name="h" ColumnName="h" />
                 <ScalarProperty Name="avgtemp" ColumnName="avgtemp" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetLatestTemp" FunctionName="temperaturelogModel.Store.GetLatestTemp">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="temperaturelogModel.GetLatestTemp_Result">
+                <ScalarProperty Name="deviceID" ColumnName="deviceID" />
+                <ScalarProperty Name="timestamp" ColumnName="timestamp" />
+                <ScalarProperty Name="value" ColumnName="value" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

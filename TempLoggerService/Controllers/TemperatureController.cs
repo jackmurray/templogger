@@ -49,6 +49,18 @@ namespace TempLoggerService.Controllers
                 select new TempEntry() {device = id, temp = e.value, timestamp = e.timestamp}).ToList();
         }
 
+        public TempEntry GetLatestTemp(Guid id)
+        {
+            temperaturelogEntities ent = new temperaturelogEntities();
+            var res = ent.GetLatestTemp(id);
+            if (res != null && res.Any())
+            {
+                var i = res.First();
+                return new TempEntry() { timestamp = i.timestamp, temp = i.value, device = id };
+            }
+            else return null;
+        }
+
         // POST api/values
         public void LogTemp(TempEntry entry)
         {
