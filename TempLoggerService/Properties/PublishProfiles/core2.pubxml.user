@@ -175,10 +175,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="bin/TempLoggerService.dll">
-      <publishTime>06/07/2015 12:01:50</publishTime>
+      <publishTime>10/11/2015 12:03:13</publishTime>
     </File>
     <File Include="bin/TempLoggerService.Models.dll">
-      <publishTime>06/07/2015 12:01:49</publishTime>
+      <publishTime>10/11/2015 11:21:30</publishTime>
     </File>
     <File Include="bin/WebGrease.dll">
       <publishTime>02/27/2015 13:51:05</publishTime>
@@ -505,16 +505,16 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/27/2015 13:50:59</publishTime>
     </File>
     <File Include="TemperatureModel.edmx.diagram">
-      <publishTime>03/07/2015 12:58:38</publishTime>
+      <publishTime>10/11/2015 11:31:45</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>06/07/2015 12:02:50</publishTime>
+      <publishTime>10/11/2015 12:03:45</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>02/27/2015 13:50:39</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>06/07/2015 11:24:07</publishTime>
+      <publishTime>10/11/2015 11:19:57</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>02/27/2015 13:50:39</publishTime>
@@ -523,7 +523,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/27/2015 13:50:39</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>03/08/2015 09:46:57</publishTime>
+      <publishTime>10/11/2015 11:58:10</publishTime>
     </File>
   </ItemGroup>
 </Project>
