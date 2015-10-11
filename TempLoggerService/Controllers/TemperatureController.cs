@@ -53,12 +53,15 @@ namespace TempLoggerService.Controllers
         {
             temperaturelogEntities ent = new temperaturelogEntities();
             var res = ent.GetLatestTemp(id);
-            if (res != null && res.Any())
+            try
             {
                 var i = res.First();
-                return new TempEntry() { timestamp = i.timestamp, temp = i.value, device = id };
+                return new TempEntry() {timestamp = i.timestamp, temp = i.value, device = id};
             }
-            else return null;
+            catch
+            {
+                return null;
+            }
         }
 
         // POST api/values
