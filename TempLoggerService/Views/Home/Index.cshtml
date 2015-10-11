@@ -11,6 +11,7 @@
         </div>
     </section>
     <section class="content-wrapper main-content clear-fix">
+        Current temperature: <span id="currenttemp"></span><br />
         <canvas id="myChart" width="800" height="400"></canvas>
         <script type="text/javascript">
             var ctx = document.getElementById("myChart").getContext("2d");
@@ -34,6 +35,10 @@
                     }
 
                     var myLineChart = new Chart(ctx).Line(chartdata, { bezierCurve: false });
+                });
+
+                $.getJSON("api/temperature/GetLatestTemp/" + data, function(latesttemp) {
+                    $("#currenttemp").html(latesttemp.temp + " @@ " + latesttemp.timestamp);
                 });
             });
         </script>
