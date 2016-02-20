@@ -30,7 +30,7 @@
                 }]
             };
 
-            $.getJSON("api/device/rpi2", function(data) {
+            $.getJSON("api/device/rpi1", function(data) {
                 $.getJSON("api/temperature/GetLast24HourTemps/" + data, function (tempdata) {
                     for (var i = 0; i < tempdata.length; i++) {
                         chartdata.labels.push(tempdata[i].hour);
