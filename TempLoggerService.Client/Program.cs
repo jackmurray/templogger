@@ -54,24 +54,22 @@ namespace TempLoggerService.Client
         static void Main(string[] args)
         {
             Setup();
+
+            if (args[0] == "--set")
+            {
+                SetTemperature(args[1], Decimal.Parse(args[2]));
+                return;
+            }
+
             string hostname = Dns.GetHostName();
             Console.WriteLine("Hostname: {0}", hostname);
-            Guid id = GetDevice(hostname);           
+            Guid id = GetDevice(hostname);
 
             while (true)
             {
-                TempEntry n = new TempEntry()
-                {
-                    temp = GetTemp(),
-                    device = id,
-                    timestamp = DateTime.UtcNow
-                };
-
                 try
                 {
-                    HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
-                    if (!postresp.IsSuccessStatusCode)
-                        throw new Exception("Failed to log temperature.");
+                    SetTemperature(id, GetTempFrom1WireSensor());
 
                     Thread.Sleep(30000);
                 }
@@ -83,7 +81,26 @@ namespace TempLoggerService.Client
             }            
         }
 
-        private static decimal GetTemp()
+        private static void SetTemperature(Guid devID, decimal temperature)
+        {
+            TempEntry n = new TempEntry()
+            {
+                temp = temperature,
+                device = devID,
+                timestamp = DateTime.UtcNow
+            };
+
+            HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
+            if (!postresp.IsSuccessStatusCode)
+                throw new Exception("Failed to log temperature.");
+        }
+
+        private static void SetTemperature(string device, decimal temperature)
+        {
+            SetTemperature(GetDevice(device), temperature);
+        }
+
+        private static decimal GetTempFrom1WireSensor()
         {
             string data = File.ReadAllText("/sys/bus/w1/devices/28-000006a00e95/w1_slave");
             Match m = Regex.Match(data, "t=([0-9]+)", RegexOptions.None);
