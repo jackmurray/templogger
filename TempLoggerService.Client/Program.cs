@@ -52,7 +52,8 @@ namespace TempLoggerService.Client
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
         static void Main(string[] args)
-        {          
+        {
+            Setup();
             string hostname = Dns.GetHostName();
             Console.WriteLine("Hostname: {0}", hostname);
             Guid id = GetDevice(hostname);           
