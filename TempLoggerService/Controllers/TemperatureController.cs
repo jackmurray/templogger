@@ -56,7 +56,7 @@ namespace TempLoggerService.Controllers
             try
             {
                 var i = res.First();
-                return new TempEntry() {timestamp = i.timestamp, temp = i.value, device = id};
+                return new TempEntry() {timestamp = i.timestamp.ToLocalTime(), temp = i.value, device = id};
             }
             catch
             {
