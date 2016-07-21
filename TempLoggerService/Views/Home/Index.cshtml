@@ -11,14 +11,23 @@
         </div>
     </section>
     <section class="content-wrapper main-content clear-fix">
-        @Html.DropDownList("SelectDevice", (IEnumerable<SelectListItem>)ViewBag.devices)
+        <form action="" method="get">
+            @Html.DropDownList("SelectDevice", (IEnumerable<SelectListItem>)ViewBag.devices)
+        </form>
         <br />
+        <script type="text/javascript">
+            $("#SelectDevice").change(function () {
+                window.location.href = "?id=" + $("#SelectDevice :selected").text()
+            });
+        </script>
 
+        Data for device @ViewBag.devname<br />
         Current temperature: <span id="currenttemp"></span><br />
         Min temperature: <span id="mintemp"></span><br />
         Max temperature: <span id="maxtemp"></span><br />
         ΔT: <span id="deltaT"></span><br /><br />
         <canvas id="myChart" width="800" height="400"></canvas>
+        
         <script type="text/javascript">
             var ctx = document.getElementById("myChart").getContext("2d");
             var chartdata = { labels: [], datasets: [{
@@ -32,9 +41,9 @@
                     data: []
                 }]
             };
-
-            $.getJSON("api/device/rpi1", function(data) {
-                $.getJSON("api/temperature/GetLast24HourTemps/" + data, function (tempdata) {
+            
+            $.getJSON("@Url.HttpRouteUrl("DeviceApi", new { controller = "Device", id = ViewBag.devname })", function(data) {
+                $.getJSON("@Url.HttpRouteUrl("DefaultApi", new { controller = "Temperature", action= "GetLast24HourTemps" })/" + data, function (tempdata) {
                     for (var i = 0; i < tempdata.length; i++) {
                         chartdata.labels.push(tempdata[i].hour);
                         chartdata.datasets[0].data.push(tempdata[i].avgtemp);
@@ -55,7 +64,7 @@
                     $("#deltaT").html((max.avgtemp - min.avgtemp).toFixed(2));
                 });
 
-                $.getJSON("api/temperature/GetLatestTemp/" + data, function(latesttemp) {
+                $.getJSON("@Url.HttpRouteUrl("DefaultApi", new { controller = "Temperature", action = "GetLatestTemp" })/" + data, function(latesttemp) {
                     $("#currenttemp").html(latesttemp.temp + " @@ " + latesttemp.timestamp);
                 });
             });

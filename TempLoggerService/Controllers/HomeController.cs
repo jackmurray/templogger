@@ -10,9 +10,14 @@ namespace TempLoggerService.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+
+        public ActionResult Index(string id)
         {
             ViewBag.devices = GetDevices();
+            if (String.IsNullOrEmpty(id))
+                id = "rpi1";
+
+            ViewBag.devname = id;
             return View();
         }
 
@@ -29,6 +34,8 @@ namespace TempLoggerService.Controllers
                                 });
 
             List<SelectListItem> items = new List<SelectListItem>();
+            items.Add(new SelectListItem { Value = "", Text = "", Selected = true}); //the blank one to go at the top.
+            devs = devs.OrderBy(d => d.name);
             foreach (var dev in devs)
             {
                 items.Add(new SelectListItem { Value = dev.id.ToString(), Text = dev.name});
