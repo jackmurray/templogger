@@ -47,7 +47,7 @@ namespace TempLoggerService.Client
             client = new HttpClient();
 
             // New code:
-            client.BaseAddress = new Uri("http://core2/TempLoggerService/");
+            client.BaseAddress = new Uri("http://templogger.corp.c0rporation.com/TempLoggerService/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
@@ -55,10 +55,13 @@ namespace TempLoggerService.Client
         {
             Setup();
 
-            if (args[0] == "--set")
+            if (args.Length > 0)
             {
-                SetTemperature(args[1], Decimal.Parse(args[2]));
-                return;
+                if (args[0] == "--set")
+                {
+                    SetTemperature(args[1], Decimal.Parse(args[2]));
+                    return;
+                }
             }
 
             string hostname = Dns.GetHostName();
