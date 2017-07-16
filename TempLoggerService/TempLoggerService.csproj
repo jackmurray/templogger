@@ -246,7 +246,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <None Include="Properties\PublishProfiles\core2.pubxml" />
+    <None Include="Properties\PublishProfiles\coreapp01.pubxml" />
     <Content Include="Scripts\Chart.js\.travis.yml" />
     <Content Include="Scripts\Chart.js\bower.json" />
     <Content Include="Scripts\Chart.js\CONTRIBUTING.md" />

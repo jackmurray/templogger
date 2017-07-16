@@ -6,7 +6,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <_PublishTargetUrl>\\core2\c$\inetpub\wwwroot\TempLoggerService</_PublishTargetUrl>
+    <_PublishTargetUrl>\\coreapp01\c$\inetpub\wwwroot\TempLoggerService</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
     <File Include="Areas/HelpPage/HelpPage.css">
@@ -175,10 +175,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/20/2016 16:12:34</publishTime>
     </File>
     <File Include="bin/TempLoggerService.dll">
-      <publishTime>02/20/2016 16:13:30</publishTime>
+      <publishTime>07/16/2017 10:58:37</publishTime>
     </File>
     <File Include="bin/TempLoggerService.Models.dll">
-      <publishTime>02/20/2016 16:13:29</publishTime>
+      <publishTime>07/16/2017 10:58:36</publishTime>
     </File>
     <File Include="bin/WebGrease.dll">
       <publishTime>02/20/2016 16:12:35</publishTime>
@@ -508,7 +508,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/20/2016 16:12:33</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>02/20/2016 16:13:21</publishTime>
+      <publishTime>07/21/2016 19:14:15</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>02/20/2016 16:12:33</publishTime>
@@ -523,7 +523,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/20/2016 16:12:33</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>02/20/2016 16:13:31</publishTime>
+      <publishTime>07/16/2017 10:58:38</publishTime>
     </File>
   </ItemGroup>
 </Project>
