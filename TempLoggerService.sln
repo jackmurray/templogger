@@ -5,11 +5,11 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempLoggerService", "TempLoggerService\TempLoggerService.csproj", "{BC1C79A9-04D6-4C3C-AC9B-D0872096D23D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempLoggerService.Models", "TempLoggerService.Models\TempLoggerService.Models.csproj", "{43B5DD51-C3C5-4900-BD6D-09C306B5A649}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.ModelsCore", "TempLoggerService.ModelsCore\TempLoggerService.ModelsCore.csproj", "{C81CE88E-4560-4875-A442-7AE76A5B78CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.ClientCore", "TempLoggerService.ClientCore\TempLoggerService.ClientCore.csproj", "{83D98B27-9BBC-4D21-BBFD-A14677A46F69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempLoggerService.Client", "TempLoggerService.Client\TempLoggerService.Client.csproj", "{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempLoggerService.ModelsCore", "TempLoggerService.ModelsCore\TempLoggerService.ModelsCore.csproj", "{C81CE88E-4560-4875-A442-7AE76A5B78CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +21,18 @@ Global
 		{BC1C79A9-04D6-4C3C-AC9B-D0872096D23D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC1C79A9-04D6-4C3C-AC9B-D0872096D23D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC1C79A9-04D6-4C3C-AC9B-D0872096D23D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{43B5DD51-C3C5-4900-BD6D-09C306B5A649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43B5DD51-C3C5-4900-BD6D-09C306B5A649}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43B5DD51-C3C5-4900-BD6D-09C306B5A649}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43B5DD51-C3C5-4900-BD6D-09C306B5A649}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C81CE88E-4560-4875-A442-7AE76A5B78CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C81CE88E-4560-4875-A442-7AE76A5B78CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C81CE88E-4560-4875-A442-7AE76A5B78CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C81CE88E-4560-4875-A442-7AE76A5B78CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

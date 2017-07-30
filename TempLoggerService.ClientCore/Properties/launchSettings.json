@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TempLoggerService.ClientCore": {
+      "commandName": "Project",
+      "commandLineArgs": "--set test 1"
+    }
+  }
+}

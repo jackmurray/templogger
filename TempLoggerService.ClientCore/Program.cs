@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using TempLoggerService.Models;
+using Newtonsoft.Json;
 
 namespace TempLoggerService.Client
 {
@@ -51,6 +52,7 @@ namespace TempLoggerService.Client
             //client.BaseAddress = new Uri("http://localhost:11317/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.TransferEncodingChunked = false;
         }
         static void Main(string[] args)
         {
@@ -93,8 +95,12 @@ namespace TempLoggerService.Client
                 device = devID,
                 timestamp = DateTime.UtcNow
             };
+            var stringContent = new StringContent(JsonConvert.SerializeObject(n), Encoding.UTF8, "application/json");
+            //for some reason, using PostAsJsonAsync here does not work. no content-length header is added and HttpClient uses chunked encoding which it seems
+            //that ASP.NET can't deal with. Manually doing the JSON conversion fixes the problem...
+            //HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
 
-            HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
+            HttpResponseMessage postresp = client.PostAsync("api/temperature/LogTemp", stringContent).Result;
             if (!postresp.IsSuccessStatusCode)
                 throw new Exception("Failed to log temperature.");
         }
