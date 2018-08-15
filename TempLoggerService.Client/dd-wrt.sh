@@ -1,5 +1,5 @@
 #!/bin/sh
-DATE=`date "+%Y-%m-%d %H:%M:%S"`
+DATE=`date --utc "+%Y-%m-%d %H:%M:%S"`
 
 GETTEMP1=`wl -i eth1 phy_tempsense | awk '{ print $1}'`
 TEMP24=$((GETTEMP1/2+20))
