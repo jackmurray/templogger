@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace TempLoggerService.Models
 {
     public class TempEntry
     {
-        public Guid device;
-        public decimal temp;
-        public DateTime timestamp;
+        public Guid device { get; set; }
+        public decimal temp { get; set; }
+        public DateTime timestamp { get; set; }
     }
 }
