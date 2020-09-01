@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempLoggerService", "TempLoggerService\TempLoggerService.csproj", "{BC1C79A9-04D6-4C3C-AC9B-D0872096D23D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.ModelsCore", "TempLoggerService.ModelsCore\TempLoggerService.ModelsCore.csproj", "{C81CE88E-4560-4875-A442-7AE76A5B78CE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.ClientCore", "TempLoggerService.ClientCore\TempLoggerService.ClientCore.csproj", "{83D98B27-9BBC-4D21-BBFD-A14677A46F69}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempLoggerService.Client", "TempLoggerService.Client\TempLoggerService.Client.csproj", "{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +27,11 @@ Global
 		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83D98B27-9BBC-4D21-BBFD-A14677A46F69}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C9B0B2F-DB42-43A5-816B-C86B68AA69D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB02A014-5CD7-4A3A-A435-D05ECA6FA291}
 	EndGlobalSection
 EndGlobal
