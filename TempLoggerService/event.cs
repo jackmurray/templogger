@@ -12,12 +12,11 @@ namespace TempLoggerService
     using System;
     using System.Collections.Generic;
     
-    public partial class temperature
+    public partial class @event
     {
-        public System.Guid deviceID { get; set; }
-        public System.DateTime timestamp { get; set; }
-        public decimal value { get; set; }
-    
-        public virtual device device { get; set; }
+        public System.Guid eventID { get; set; }
+        public string eventType { get; set; }
+        public System.DateTime eventDate { get; set; }
+        public string eventDetail { get; set; }
     }
 }
