@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Objects;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,7 +29,7 @@ namespace TempLoggerService.Controllers
         {
             temperaturelogEntities ent = new temperaturelogEntities();
 
-            ObjectResult<GetTempRange_Result> getTempsLast24HoursResults = ent.GetTempsLast24Hours(id);
+            var getTempsLast24HoursResults = ent.GetTempsLast24Hours(id);
             return (from i in getTempsLast24HoursResults
                 select new AverageTempModel() {hour = (int) i.h, avgtemp = (decimal) i.avgtemp}).ToList();
         }

@@ -4,15 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="temperaturelogModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityContainer Name="temperaturelogModelStoreContainer">
-          <EntitySet Name="device" EntityType="temperaturelogModel.Store.device" store:Type="Tables" Schema="dbo" />
-          <EntitySet Name="temperature" EntityType="temperaturelogModel.Store.temperature" store:Type="Tables" Schema="dbo" />
-          <AssociationSet Name="FK_temperature_device" Association="temperaturelogModel.Store.FK_temperature_device">
-            <End Role="device" EntitySet="device" />
-            <End Role="temperature" EntitySet="temperature" />
-          </AssociationSet>
-        </EntityContainer>
+    <Schema Namespace="temperaturelogModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="device">
           <Key>
             <PropertyRef Name="deviceID" />
@@ -20,18 +12,27 @@
           <Property Name="deviceID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="deviceName" Type="varchar(max)" Nullable="false" />
         </EntityType>
+        <EntityType Name="event">
+          <Key>
+            <PropertyRef Name="eventID" />
+          </Key>
+          <Property Name="eventID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="eventType" Type="nchar" MaxLength="10" Nullable="false" />
+          <Property Name="eventDate" Type="datetime" Nullable="false" />
+          <Property Name="eventDetail" Type="text" Nullable="false" />
+        </EntityType>
         <EntityType Name="temperature">
           <Key>
             <PropertyRef Name="deviceID" />
             <PropertyRef Name="timestamp" />
           </Key>
           <Property Name="deviceID" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="timestamp" Type="datetime2" Nullable="false" />
-          <Property Name="value" Type="decimal" Nullable="false" Scale="3" />
+          <Property Name="timestamp" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="value" Type="decimal" Precision="18" Scale="3" Nullable="false" />
         </EntityType>
         <Association Name="FK_temperature_device">
-          <End Role="device" Type="temperaturelogModel.Store.device" Multiplicity="1" />
-          <End Role="temperature" Type="temperaturelogModel.Store.temperature" Multiplicity="*" />
+          <End Role="device" Type="Self.device" Multiplicity="1" />
+          <End Role="temperature" Type="Self.temperature" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="device">
               <PropertyRef Name="deviceID" />
@@ -52,6 +53,15 @@
         <Function Name="GetTempsLast24Hours" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="device" Type="uniqueidentifier" Mode="In" />
         </Function>
+        <EntityContainer Name="temperaturelogModelStoreContainer">
+          <EntitySet Name="device" EntityType="Self.device" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="event" EntityType="Self.event" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="temperature" EntityType="Self.temperature" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_temperature_device" Association="Self.FK_temperature_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="temperature" EntitySet="temperature" />
+          </AssociationSet>
+        </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -72,8 +82,9 @@
           <Parameter Name="device" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="GetLatestTemp" ReturnType="Collection(temperaturelogModel.GetLatestTemp_Result)">
-            <Parameter Name="deviceID" Mode="In" Type="Guid" />
+          <Parameter Name="deviceID" Mode="In" Type="Guid" />
           </FunctionImport>
+          <EntitySet Name="events" EntityType="temperaturelogModel.event" />
         </EntityContainer>
         <EntityType Name="device">
           <Key>
@@ -114,6 +125,15 @@
           <Property Type="DateTime" Name="timestamp" Nullable="false" />
           <Property Type="Decimal" Name="value" Nullable="false" Precision="18" Scale="3" />
         </ComplexType>
+        <EntityType Name="event">
+          <Key>
+            <PropertyRef Name="eventID" />
+          </Key>
+          <Property Name="eventID" Type="Guid" Nullable="false" />
+          <Property Name="eventType" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="eventDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="eventDetail" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -162,6 +182,16 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="events">
+            <EntityTypeMapping TypeName="temperaturelogModel.event">
+              <MappingFragment StoreEntitySet="event">
+                <ScalarProperty Name="eventDetail" ColumnName="eventDetail" />
+                <ScalarProperty Name="eventDate" ColumnName="eventDate" />
+                <ScalarProperty Name="eventType" ColumnName="eventType" />
+                <ScalarProperty Name="eventID" ColumnName="eventID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -179,6 +209,7 @@
         <DesignerProperty Name="EnablePluralization" Value="True" />
         <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="True" />
       </DesignerInfoPropertySet>
     </Options>
     <!-- Diagram content (shape and connector positions) -->
