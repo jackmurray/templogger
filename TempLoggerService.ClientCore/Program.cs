@@ -11,71 +11,50 @@ using System.Threading;
 using System.Threading.Tasks;
 using TempLoggerService.Models;
 using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
+using TempLoggerService.ClientCore;
 
 namespace TempLoggerService.Client
 {
     class Program
     {
-        private static HttpClient client;
+        private static ITemperatureLogClient _client;
+        private static IServiceProvider serviceProvider;
 
-        private static Guid GetDevice(string name)
+
+        private static void ConfigureServices()
         {
-            Guid id = Guid.Empty;
-            HttpResponseMessage response = client.GetAsync(String.Format("api/device/{0}", name)).Result;
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                HttpResponseMessage createresp = client.PostAsJsonAsync("api/device/", name).Result;
-                if (createresp.StatusCode != HttpStatusCode.OK)
-                    throw new Exception("Unable to create device: " + createresp.StatusCode);
-                else
-                    id = createresp.Content.ReadAsAsync<Guid>().Result;
-            }
-            else if (response.StatusCode == HttpStatusCode.OK)
-            {
-                id = response.Content.ReadAsAsync<Guid>().Result;
-            }
-            else
-                throw new Exception("Unable to fetch device GUID");
+            var services = new ServiceCollection();
 
-            if (id == Guid.Empty)
-                throw new Exception("For some reason we still failed to get the device GUID.");
-
-            return id;
+            services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://templogger.corp.c0rporation.com/TempLoggerService/")));            
+            
+            serviceProvider = services.BuildServiceProvider();
         }
 
-        private static void Setup()
-        {
-            client = new HttpClient();
 
-            // New code:
-            client.BaseAddress = new Uri("http://templogger.corp.c0rporation.com/TempLoggerService/");
-            //client.BaseAddress = new Uri("http://localhost:11317/");
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.TransferEncodingChunked = false;
-        }
         static void Main(string[] args)
         {
-            Setup();
+            ConfigureServices();
+            _client = serviceProvider.GetService<ITemperatureLogClient>();
 
             if (args.Length > 0)
             {
                 if (args[0] == "--set")
                 {
-                    SetTemperature(args[1], Decimal.Parse(args[2]));
+                    _client.SetTemperature(args[1], Decimal.Parse(args[2]));
                     return;
                 }
             }
 
             string hostname = Dns.GetHostName();
             Console.WriteLine("Hostname: {0}", hostname);
-            Guid id = GetDevice(hostname);
+            Guid id = _client.GetDeviceGuidByName(hostname); //For caching basically, so that we don't fetch it every time since it won't change.
 
             while (true)
             {
                 try
                 {
-                    SetTemperature(id, GetTempFrom1WireSensor());
+                    _client.SetTemperature(id, GetTempFrom1WireSensor());
 
                     Thread.Sleep(30000);
                 }
@@ -85,29 +64,6 @@ namespace TempLoggerService.Client
                     Console.WriteLine(ex.StackTrace);
                 }
             }            
-        }
-
-        private static void SetTemperature(Guid devID, decimal temperature)
-        {
-            TempEntry n = new TempEntry()
-            {
-                temp = temperature,
-                device = devID,
-                timestamp = DateTime.UtcNow
-            };
-            var stringContent = new StringContent(JsonConvert.SerializeObject(n), Encoding.UTF8, "application/json");
-            //for some reason, using PostAsJsonAsync here does not work. no content-length header is added and HttpClient uses chunked encoding which it seems
-            //that ASP.NET can't deal with. Manually doing the JSON conversion fixes the problem...
-            //HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
-
-            HttpResponseMessage postresp = client.PostAsync("api/temperature/LogTemp", stringContent).Result;
-            if (!postresp.IsSuccessStatusCode)
-                throw new Exception("Failed to log temperature.");
-        }
-
-        private static void SetTemperature(string device, decimal temperature)
-        {
-            SetTemperature(GetDevice(device), temperature);
         }
 
         private static decimal GetTempFrom1WireSensor()
