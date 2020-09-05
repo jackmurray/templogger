@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -10,9 +11,9 @@ namespace TempLoggerService.ClientCore
     {
         private string _deviceFilePath;
 
-        public OneWireTemperatureProvider(string deviceFilePath)
+        public OneWireTemperatureProvider(IConfiguration configuration)
         {
-            _deviceFilePath = deviceFilePath;
+            _deviceFilePath = configuration.GetSection("TemperatureProviders").GetSection("OneWire").GetSection("File").Value;
         }
 
         public decimal GetTemperature()

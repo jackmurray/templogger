@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TempLoggerService.ClientCore;
 
@@ -10,7 +11,14 @@ namespace TempLoggerService.Client
     {
         private static ITemperatureLogClient _client;
         private static IServiceProvider serviceProvider;
+        private static IConfiguration config;
 
+        private static void Configuration()
+        {
+            config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", false, true)
+                .Build();
+        }
 
         private static void ConfigureServices()
         {
@@ -18,7 +26,8 @@ namespace TempLoggerService.Client
 
             services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://templogger.corp.c0rporation.com/TempLoggerService/")));
             //services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://localhost:11317")));
-            services.AddSingleton<ITemperatureProvider>(new OneWireTemperatureProvider("/sys/bus/w1/devices/28-000006a00e95/w1_slave"));
+            services.AddSingleton<ITemperatureProvider, OneWireTemperatureProvider>();
+            services.AddSingleton(config);
 
             serviceProvider = services.BuildServiceProvider();
         }
@@ -26,7 +35,9 @@ namespace TempLoggerService.Client
 
         static void Main(string[] args)
         {
+            Configuration();
             ConfigureServices();
+
             _client = serviceProvider.GetService<ITemperatureLogClient>();
 
             if (args.Length > 0)
@@ -48,13 +59,15 @@ namespace TempLoggerService.Client
                 try
                 {
                     _client.SetTemperature(id, provider.GetTemperature());
-
-                    Thread.Sleep(30000);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                     Console.WriteLine(ex.StackTrace);
+                }
+                finally
+                {
+                    Thread.Sleep(30000);
                 }
             }            
         }
