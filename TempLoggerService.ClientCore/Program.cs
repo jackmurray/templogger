@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using TempLoggerService.Models;
-using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
 using TempLoggerService.ClientCore;
 
@@ -27,6 +17,8 @@ namespace TempLoggerService.Client
             var services = new ServiceCollection();
 
             services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://templogger.corp.c0rporation.com/TempLoggerService/")));
+            //services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://localhost:11317")));
+            services.AddSingleton<ITemperatureProvider>(new OneWireTemperatureProvider("/sys/bus/w1/devices/28-000006a00e95/w1_slave"));
 
             serviceProvider = services.BuildServiceProvider();
         }
@@ -49,12 +41,13 @@ namespace TempLoggerService.Client
             string hostname = Dns.GetHostName();
             Console.WriteLine("Hostname: {0}", hostname);
             Guid id = _client.GetDeviceGuidByName(hostname); //For caching basically, so that we don't fetch it every time since it won't change.
+            ITemperatureProvider provider = serviceProvider.GetService<ITemperatureProvider>();
 
             while (true)
             {
                 try
                 {
-                    _client.SetTemperature(id, GetTempFrom1WireSensor());
+                    _client.SetTemperature(id, provider.GetTemperature());
 
                     Thread.Sleep(30000);
                 }
@@ -64,13 +57,6 @@ namespace TempLoggerService.Client
                     Console.WriteLine(ex.StackTrace);
                 }
             }            
-        }
-
-        private static decimal GetTempFrom1WireSensor()
-        {
-            string data = File.ReadAllText("/sys/bus/w1/devices/28-000006a00e95/w1_slave");
-            Match m = Regex.Match(data, "t=([0-9]+)", RegexOptions.None);
-            return Convert.ToDecimal(m.Groups[1].Value) / 1000; //the w1_slave file outputs the temperature in milli-celcius
         }
     }
 }
