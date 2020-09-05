@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using TempLoggerService.Models;
 
 namespace TempLoggerService.ClientCore
@@ -25,17 +25,17 @@ namespace TempLoggerService.ClientCore
             _client.DefaultRequestHeaders.TransferEncodingChunked = false;
         }
 
-        public Guid GetDeviceGuidByName(string name)
+        public async Task<Guid> GetDeviceGuidByName(string name)
         {
             Guid id = Guid.Empty;
-            HttpResponseMessage response = _client.GetAsync(String.Format("api/device/{0}", name)).Result;
+            HttpResponseMessage response = await _client.GetAsync(String.Format("api/device/{0}", name));
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                id = CreateDevice(name);
+                id = await CreateDevice(name);
             }
             else if (response.StatusCode == HttpStatusCode.OK)
             {
-                id = response.Content.ReadAsAsync<Guid>().Result;
+                id = await response.Content.ReadAsAsync<Guid>();
             }
             else
                 throw new Exception("Unable to fetch device GUID");
@@ -46,7 +46,7 @@ namespace TempLoggerService.ClientCore
             return id;
         }
 
-        public void SetTemperature(Guid devID, decimal temperature)
+        public async Task SetTemperature(Guid devID, decimal temperature)
         {
             TempEntry n = new TempEntry()
             {
@@ -59,23 +59,23 @@ namespace TempLoggerService.ClientCore
             //that ASP.NET can't deal with. Manually doing the JSON conversion fixes the problem...
             //HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
 
-            HttpResponseMessage postresp = _client.PostAsync("api/temperature/LogTemp", stringContent).Result;
+            HttpResponseMessage postresp = await _client.PostAsync("api/temperature/LogTemp", stringContent);
             if (!postresp.IsSuccessStatusCode)
                 throw new Exception("Failed to log temperature.");
         }
 
-        public void SetTemperature(string device, decimal temperature)
+        public async Task SetTemperature(string device, decimal temperature)
         {
-            SetTemperature(GetDeviceGuidByName(device), temperature);
+            await SetTemperature(await GetDeviceGuidByName(device), temperature);
         }
 
-        private Guid CreateDevice(string name)
+        private async Task<Guid> CreateDevice(string name)
         {
-            HttpResponseMessage createresp = _client.PostAsJsonAsync("api/device/", name).Result;
+            HttpResponseMessage createresp = await _client.PostAsJsonAsync("api/device/", name);
             if (createresp.StatusCode != HttpStatusCode.OK)
                 throw new Exception("Unable to create device: " + createresp.StatusCode);
             else
-                return createresp.Content.ReadAsAsync<Guid>().Result;
+                return await createresp.Content.ReadAsAsync<Guid>();
         }
     }
 }

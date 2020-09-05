@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TempLoggerService.ClientCore;
@@ -44,21 +45,26 @@ namespace TempLoggerService.Client
             {
                 if (args[0] == "--set")
                 {
-                    _client.SetTemperature(args[1], Decimal.Parse(args[2]));
+                    _client.SetTemperature(args[1], Decimal.Parse(args[2])).Wait(); //cannot await because Main() can't be async.
                     return;
                 }
             }
 
+            MainAsync().Wait();
+        }
+
+        private static async Task MainAsync()
+        {
             string hostname = Dns.GetHostName();
             Console.WriteLine("Hostname: {0}", hostname);
-            Guid id = _client.GetDeviceGuidByName(hostname); //For caching basically, so that we don't fetch it every time since it won't change.
+            Guid id = await _client.GetDeviceGuidByName(hostname); //For caching basically, so that we don't fetch it every time since it won't change.
             ITemperatureProvider provider = serviceProvider.GetService<ITemperatureProvider>();
 
             while (true)
             {
                 try
                 {
-                    _client.SetTemperature(id, provider.GetTemperature());
+                    await _client.SetTemperature(id, provider.GetTemperature());
                 }
                 catch (Exception ex)
                 {
@@ -67,9 +73,9 @@ namespace TempLoggerService.Client
                 }
                 finally
                 {
-                    Thread.Sleep(30000);
+                    await Task.Delay(30000);
                 }
-            }            
+            }
         }
     }
 }

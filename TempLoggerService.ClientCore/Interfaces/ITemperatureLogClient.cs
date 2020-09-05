@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace TempLoggerService.ClientCore
 {
     interface ITemperatureLogClient
     {
-        public Guid GetDeviceGuidByName(string name);
-        public void SetTemperature(Guid devID, decimal temperature);
-        public void SetTemperature(string device, decimal temperature);
+        public Task<Guid> GetDeviceGuidByName(string name);
+        public Task SetTemperature(Guid devID, decimal temperature);
+        public Task SetTemperature(string device, decimal temperature);
     }
 }
