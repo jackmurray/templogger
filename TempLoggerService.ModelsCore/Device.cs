@@ -10,6 +10,7 @@ namespace TempLoggerService.ModelsCore
         [Key]
         [Required]
         public Guid DeviceId { get; set; }
+        [Required]
         public string DeviceName { get; set; }
         public List<Temperature> Temperatures { get; set; }
     }

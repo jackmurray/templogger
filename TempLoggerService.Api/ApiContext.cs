@@ -15,12 +15,9 @@ namespace TempLoggerService.Api
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Device>()
-                .HasMany<Temperature>()
-                .WithOne();
-
             modelBuilder.Entity<Temperature>()
-                .HasKey(t => new { t.Device, t.Timestamp });
+                .Property(t => t.Value)
+                .HasColumnType("decimal(9,3)");
         }
     }
 
