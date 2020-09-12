@@ -24,9 +24,23 @@ namespace TempLoggerService.Api.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var model = _context.Devices.ToList();
+            var d = _context.Devices.ToList();
             _logger.LogDebug("Fetched devices.");
-            return Ok(new { Devices = model });
+            return Ok(new { Devices = d });
+        }
+
+        [HttpPost]
+        public IActionResult Post([FromBody]string deviceName)
+        {
+            var d = _context.Devices.FirstOrDefault(d => d.DeviceName == deviceName);
+            if (d == null)
+            {
+                d = new Device() { DeviceId = Guid.NewGuid(), DeviceName = deviceName };
+                _context.Devices.Add(d);
+                _context.SaveChanges();
+            }
+
+            return Ok(d);
         }
     }
 }
