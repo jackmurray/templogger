@@ -33,6 +33,7 @@ namespace TempLoggerService.Api
             services.AddDbContext<ApiContext>(options => options.UseSqlServer(connectionString));
 
             services.AddScoped<ITemperatureRepository, TemperatureRepository>();
+            services.AddScoped<IDeviceRepository, DeviceRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

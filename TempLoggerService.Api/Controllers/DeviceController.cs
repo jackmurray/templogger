@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TempLoggerService.ModelsCore;
+using TempLoggerService.Api.Repositories;
 
 namespace TempLoggerService.Api.Controllers
 {
@@ -13,38 +14,31 @@ namespace TempLoggerService.Api.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly ILogger<DeviceController> _logger;
-        private readonly ApiContext _context;
+        private readonly IDeviceRepository _repo;
 
-        public DeviceController(ILogger<DeviceController> logger, ApiContext context)
+        public DeviceController(ILogger<DeviceController> logger, IDeviceRepository deviceRepository)
         {
             _logger = logger;
-            _context = context;
+            _repo = deviceRepository;
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var d = _context.Devices.ToList();
-            _logger.LogDebug("Fetched devices.");
+            var d = await _repo.GetAsync();
             return Ok(new { Devices = d });
         }
 
         [HttpGet("{deviceId}")]
-        public IActionResult GetById(Guid deviceId)
+        public async Task<IActionResult> GetById(Guid deviceId)
         {
-            return Ok(_context.Devices.FirstOrDefault(d => d.DeviceId == deviceId));
+            return Ok(await _repo.GetAsync(deviceId));
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]string deviceName)
+        public async Task<IActionResult> Create([FromBody]string deviceName)
         {
-            var d = _context.Devices.FirstOrDefault(d => d.DeviceName == deviceName);
-            if (d == null)
-            {
-                d = new Device() { DeviceId = Guid.NewGuid(), DeviceName = deviceName };
-                _context.Devices.Add(d);
-                _context.SaveChanges();
-            }
+            var d = await _repo.CreateAsync(deviceName);
 
             return CreatedAtAction(nameof(GetById), new { deviceId = d.DeviceId }, d);
         }
