@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TempLoggerService.ModelsCore;
+using TempLoggerService.Api.Repositories;
 
 namespace TempLoggerService.Api.Controllers
 {
@@ -13,20 +14,19 @@ namespace TempLoggerService.Api.Controllers
     public class TemperatureController : ControllerBase
     {
         private readonly ILogger<TemperatureController> _logger;
-        private readonly ApiContext _context;
+        private readonly ITemperatureRepository _temperatureRepository;
 
-        public TemperatureController(ILogger<TemperatureController> logger, ApiContext context)
+        public TemperatureController(ILogger<TemperatureController> logger, ITemperatureRepository temperatureRepository)
         {
             _logger = logger;
-            _context = context;
+            _temperatureRepository = temperatureRepository;
         }
 
         [HttpPost]
-        public IActionResult LogTemperature([FromBody]Temperature temperature)
+        public async Task<IActionResult> LogTemperature([FromBody]Temperature temperature)
         {
             temperature.Timestamp = DateTime.UtcNow; // Even if a timestamp was supplied we just want to override it anyway.
-            _context.Temperatures.Add(temperature);
-            _context.SaveChanges();
+            await _temperatureRepository.LogTemperature(temperature);
             return Ok();
         }
     }
