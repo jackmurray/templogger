@@ -12,6 +12,6 @@ namespace TempLoggerService.ModelsCore
         public Guid DeviceId { get; set; }
         [Required]
         public string DeviceName { get; set; }
-        public List<Temperature> Temperatures { get; set; }
+        //public List<Temperature> Temperatures { get; set; }
     }
 }

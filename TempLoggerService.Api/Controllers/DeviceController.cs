@@ -29,6 +29,12 @@ namespace TempLoggerService.Api.Controllers
             return Ok(new { Devices = d });
         }
 
+        [HttpGet("{deviceId}")]
+        public IActionResult GetById(Guid deviceId)
+        {
+            return Ok(_context.Devices.FirstOrDefault(d => d.DeviceId == deviceId));
+        }
+
         [HttpPost]
         public IActionResult Post([FromBody]string deviceName)
         {
@@ -40,7 +46,7 @@ namespace TempLoggerService.Api.Controllers
                 _context.SaveChanges();
             }
 
-            return Ok(d);
+            return CreatedAtAction(nameof(GetById), new { deviceId = d.DeviceId }, d);
         }
     }
 }
