@@ -40,6 +40,11 @@ namespace TempLoggerService.Api
         {
             return new StoredProcedure(this.Database.GetDbConnection());
         }
+
+        public StoredProcedure CreateStoredProcedure(string command)
+        {
+            return new StoredProcedure(this.Database.GetDbConnection(), command);
+        }
     }
 
 }

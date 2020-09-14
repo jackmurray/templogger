@@ -16,6 +16,11 @@ namespace TempLoggerService.Api
 			_command = connection.CreateCommand();
 		}
 
+		public StoredProcedure(DbConnection connection, string procedureName) : this(connection)
+		{
+			WithCommand(procedureName);
+		}
+
 		public StoredProcedure WithCommand(string procedureName)
         {
 			_command.CommandText = procedureName;

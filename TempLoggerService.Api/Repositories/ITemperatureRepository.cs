@@ -10,6 +10,7 @@ namespace TempLoggerService.Api.Repositories
     {
         Task LogTemperature(Temperature t);
         IAsyncEnumerable<HourlyAverageTemperature> GetHourlyAverageTemperature(Guid DeviceId, DateTime Start, DateTime End);
+        IAsyncEnumerable<HourlyAverageTemperature> GetLast24HourTemperatures(Guid DeviceId);
         Task<Temperature> GetLatestTemperature(Guid DeviceId);
     }
 }

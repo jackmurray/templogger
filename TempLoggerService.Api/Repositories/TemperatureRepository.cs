@@ -42,6 +42,23 @@ namespace TempLoggerService.Api.Repositories
             }
         }
 
+        public async IAsyncEnumerable<HourlyAverageTemperature> GetLast24HourTemperatures(Guid DeviceId)
+        {
+            DbDataReader reader = await _context.CreateStoredProcedure("dbo.GetLast24HourTemps")
+                .WithParameter(new SqlParameter("@Device", System.Data.SqlDbType.UniqueIdentifier) { Value = DeviceId})
+                .ExecuteAsync();
+
+            while (await reader.ReadAsync())
+            {
+                yield return new HourlyAverageTemperature()
+                {
+                    Date = (DateTime)reader["d"],
+                    Hour = (int)reader["h"],
+                    Value = (decimal)reader["avgtemp"]
+                };
+            }
+        }
+
         public async Task LogTemperature(Temperature temperature)
         {
             _context.Temperatures.Add(temperature);
