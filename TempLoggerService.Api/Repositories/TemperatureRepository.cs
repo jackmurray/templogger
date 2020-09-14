@@ -27,6 +27,8 @@ namespace TempLoggerService.Api.Repositories
                 .WithParameter(new SqlParameter("@End", System.Data.SqlDbType.DateTime) { Value = End })
                 .ExecuteAsync();
 
+            // Note that if you inspect the reader in the debugger then its results will be enumerated and the row position will
+            // be changed, which will make it appear like rows are missing.
             while (await reader.ReadAsync())
             {
                 yield return new HourlyAverageTemperature()

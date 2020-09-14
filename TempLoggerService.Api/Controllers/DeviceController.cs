@@ -29,10 +29,19 @@ namespace TempLoggerService.Api.Controllers
             return Ok(new { Devices = d });
         }
 
-        [HttpGet("{deviceId}")]
+
+        // Route Constraint to match GUIDs. Not sure what would happen if a device had a GUID as it's name but it'll probably end up confusing the routing
+        // as it'll think the name is the ID because it looks like a GUID.
+        [HttpGet("{deviceId:guid}")]
         public async Task<IActionResult> GetById(Guid deviceId)
         {
             return Ok(await _repo.GetAsync(deviceId));
+        }
+
+        [HttpGet("{deviceName}")]
+        public async Task<IActionResult> GetByName(string deviceName)
+        {
+            return Ok(await _repo.GetAsync(deviceName));
         }
 
         [HttpPost]

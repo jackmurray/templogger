@@ -9,6 +9,7 @@ namespace TempLoggerService.Api.Repositories
     {
         Task<IEnumerable<Device>> GetAsync();
         Task<Device> GetAsync(Guid deviceId);
+        Task<Device> GetAsync(string deviceName);
         Task<Device> CreateAsync(string deviceName);
     }
 }

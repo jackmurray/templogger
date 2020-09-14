@@ -27,6 +27,11 @@ namespace TempLoggerService.Api.Repositories
             return await _context.Devices.FirstOrDefaultAsync(d => d.DeviceId == deviceId);
         }
 
+        public async Task<Device> GetAsync(string deviceName)
+        {
+            return await _context.Devices.FirstOrDefaultAsync(d => d.DeviceName == deviceName);
+        }
+
         public async Task<Device> CreateAsync(string deviceName)
         {
             var d = _context.Devices.FirstOrDefault(d => d.DeviceName == deviceName);
