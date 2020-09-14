@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using TempLoggerService.ModelsCore;
 using TempLoggerService.ModelsCore.StoredProcedure;
@@ -9,9 +10,20 @@ namespace TempLoggerService.Api
     {
         public DbSet<Device> Devices { get; set; }
         public DbSet<Temperature> Temperatures { get; set; }
+
+        public static readonly Microsoft.Extensions.Logging.LoggerFactory _loggerFactory =
+            new LoggerFactory(new[] {
+                new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider()
+            });
+
         public ApiContext(DbContextOptions<ApiContext> options) : base(options)
         {
             this.Database.Migrate();
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLoggerFactory(_loggerFactory);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
