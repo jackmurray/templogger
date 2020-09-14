@@ -29,5 +29,11 @@ namespace TempLoggerService.Api.Controllers
             await _temperatureRepository.LogTemperature(temperature);
             return Ok();
         }
+
+        [HttpGet("GetTempRange/{deviceId}/{start}/{end}")]
+        public async Task<IActionResult> GetTempRange(Guid deviceId, DateTime start, DateTime end)
+        {
+            return Ok(_temperatureRepository.GetHourlyAverageTemperature(deviceId, start, end));
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using TempLoggerService.ModelsCore;
+using TempLoggerService.ModelsCore.StoredProcedure;
 
 namespace TempLoggerService.Api
 {
@@ -18,6 +19,14 @@ namespace TempLoggerService.Api
             modelBuilder.Entity<Temperature>()
                 .Property(t => t.Value)
                 .HasColumnType("decimal(9,3)");
+
+            modelBuilder.Entity<HourlyAverageTemperature>()
+                .HasNoKey();
+        }
+
+        public StoredProcedure CreateStoredProcedure()
+        {
+            return new StoredProcedure(this.Database.GetDbConnection());
         }
     }
 
