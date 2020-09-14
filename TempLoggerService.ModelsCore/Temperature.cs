@@ -16,7 +16,5 @@ namespace TempLoggerService.ModelsCore
         public Guid DeviceId { get; set; }
         public DateTime Timestamp { get; set; }
         public decimal Value { get; set; }
-
-        public Device Device { get; set; }
     }
 }

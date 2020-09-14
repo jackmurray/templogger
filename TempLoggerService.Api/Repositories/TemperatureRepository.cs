@@ -1,9 +1,11 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using TempLoggerService.ModelsCore;
 using TempLoggerService.ModelsCore.StoredProcedure;
 
@@ -44,6 +46,14 @@ namespace TempLoggerService.Api.Repositories
         {
             _context.Temperatures.Add(temperature);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Temperature> GetLatestTemperature(Guid DeviceId)
+        {
+            return  await _context.Temperatures
+                    .Where(t => t.DeviceId == DeviceId)
+                    .OrderByDescending(t => t.Timestamp)
+                    .FirstOrDefaultAsync();
         }
     }
 }
