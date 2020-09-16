@@ -41,5 +41,11 @@ namespace TempLoggerService.Api.Controllers
         {
             return Ok(await _temperatureRepository.GetLatestTemperature(deviceId));
         }
+
+        [HttpGet("GetLast24HourTemperatures/{deviceId}")]
+        public async Task<IActionResult> GetLast24HourTemperatures(Guid deviceId)
+        {
+            return Ok(_temperatureRepository.GetLast24HourTemperatures(deviceId));
+        }
     }
 }
