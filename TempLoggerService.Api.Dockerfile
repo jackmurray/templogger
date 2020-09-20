@@ -7,9 +7,14 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
+
+COPY ["TempLoggerService.ModelsCore/TempLoggerService.ModelsCore.csproj", "TempLoggerService.ModelsCore/"]
+RUN dotnet restore "TempLoggerService.ModelsCore/TempLoggerService.ModelsCore.csproj"
+COPY TempLoggerService.ModelsCore TempLoggerService.ModelsCore
+
 COPY ["TempLoggerService.Api/TempLoggerService.Api.csproj", "TempLoggerService.Api/"]
 RUN dotnet restore "TempLoggerService.Api/TempLoggerService.Api.csproj"
-COPY . .
+COPY TempLoggerService.Api TempLoggerService.Api
 WORKDIR "/src/TempLoggerService.Api"
 RUN dotnet build "TempLoggerService.Api.csproj" -c Release -o /app/build
 
