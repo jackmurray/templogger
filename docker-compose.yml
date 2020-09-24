@@ -1,0 +1,25 @@
+version: "3.2"
+
+services:
+  sqlserver:
+        ports:
+                - "1433:1433"
+        environment:
+                ACCEPT_EULA: Y
+                SA_PASSWORD: Testing123
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        container_name: sqlserver
+        restart: unless-stopped
+        tty: true
+        stdin_open: false
+
+  api:
+        ports:
+                - "5000:80"
+        environment:
+            ConnectionStrings__Database: "Data Source=sqlserver;Initial Catalog=TemperatureLog;User ID=sa;Password=Testing123;"
+        image: temploggerapi
+        container_name: temploggerapi
+        restart: unless-stopped
+        tty: true
+        stdin_open: false
