@@ -23,6 +23,10 @@ namespace TempLoggerService.Api
                     webBuilder
                         .UseStartup<Startup>()
                         .UseKestrel();
+                })
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddEnvironmentVariables();
                 });
     }
 }
