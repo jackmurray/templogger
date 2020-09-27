@@ -39,6 +39,11 @@ namespace TempLoggerService.Api
                 options.AddPolicy("devAllowAll", builder => {
                     builder.AllowAnyOrigin();
                 });
+
+                options.AddPolicy("prod", builder => {
+                    // Allow the prod API to accept requests from a dev frontend
+                    builder.WithOrigins("http://localhost:5010");
+                });
             });
         }
 
@@ -57,6 +62,10 @@ namespace TempLoggerService.Api
             if (env.IsDevelopment())
             {
                 app.UseCors("devAllowAll");
+            }
+            else
+            {
+                app.UseCors("prod");
             }
 
             app.UseAuthorization();
