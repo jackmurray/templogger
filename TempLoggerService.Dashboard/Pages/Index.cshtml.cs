@@ -15,6 +15,9 @@ namespace TempLoggerService.Dashboard.Pages
         private IConfiguration _configuration;
         public string ApiServer {get; private set;}
 
+        [BindProperty(SupportsGet = true)]
+        public string Device {get;set;}
+
         public IndexModel(ILogger<IndexModel> logger, IConfiguration configuration)
         {
             _logger = logger;
@@ -24,6 +27,7 @@ namespace TempLoggerService.Dashboard.Pages
         public void OnGet()
         {
             ApiServer = _configuration.GetSection("ApiServer").Value;
+            if (String.IsNullOrEmpty(Device)) { Device = "rpi1"; } // Set the default device to be 'rpi1'
         }
     }
 }
