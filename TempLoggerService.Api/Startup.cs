@@ -34,6 +34,12 @@ namespace TempLoggerService.Api
 
             services.AddScoped<ITemperatureRepository, TemperatureRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
+
+            services.AddCors(options => {
+                options.AddPolicy("devAllowAll", builder => {
+                    builder.AllowAnyOrigin();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +53,11 @@ namespace TempLoggerService.Api
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            if (env.IsDevelopment())
+            {
+                app.UseCors("devAllowAll");
+            }
 
             app.UseAuthorization();
 
