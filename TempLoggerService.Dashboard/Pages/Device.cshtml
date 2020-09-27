@@ -1,0 +1,34 @@
+﻿@page "{Device?}"
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>ApiServer is @Model.ApiServer</p>
+</div>
+
+<form action="">
+    <select id="SelectDevice">
+        <option>rpi1</option>
+        <option>testdevice3</option>
+    </select>
+</form>
+
+<script type="text/javascript">
+    $("#SelectDevice").change(function () {
+        window.location.href = "/Device/" + $("#SelectDevice :selected").text()
+    });
+</script>
+
+Data for device '@Model.Device'<br />
+Device ID: <span id="deviceId"></span><br />
+Current temperature: <span id="currenttemp"></span><br />
+
+<script type="text/javascript">
+    $.getJSON("http://@Model.ApiServer/api/device/@Model.Device", function(data){
+        $("#deviceId").text(data.deviceId);
+    });
+</script>

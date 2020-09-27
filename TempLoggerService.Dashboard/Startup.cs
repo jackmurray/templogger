@@ -24,7 +24,7 @@ namespace TempLoggerService.Dashboard
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages(options => {
-                options.Conventions.AddPageRoute("/Index", "/");
+                options.Conventions.AddPageRoute("/Device", "/");
             });
         }
 
