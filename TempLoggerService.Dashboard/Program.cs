@@ -21,8 +21,7 @@ namespace TempLoggerService.Dashboard
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>()
-                    .UseKestrel()
-                    .UseUrls("http://0.0.0.0:5010");
+                    .UseKestrel();
                 });
     }
 }
