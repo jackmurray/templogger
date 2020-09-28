@@ -12,6 +12,7 @@
 
 <form action="">
     <select id="SelectDevice">
+        <option></option>
         <option>rpi1</option>
         <option>testdevice3</option>
     </select>
@@ -24,15 +25,60 @@
 </script>
 
 Data for device '@Model.Device'<br />
-Device ID: <span id="deviceId"></span><br />
 Current temperature: <span id="currenttemp"></span><br />
+Min temperature: <span id="mintemp"></span><br />
+Max temperature: <span id="maxtemp"></span><br />
+ΔT: <span id="deltaT"></span><br /><br />
+
+<canvas id="temperatureChart" width="800" height="400"></canvas>
 
 <script type="text/javascript">
+    // Chart setup
+    var ctx = document.getElementById("temperatureChart").getContext("2d");
+    var chartdata = { labels: [], datasets: [{
+            label: "'@Model.Device' Temperature",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: []
+        }]
+    };
+
+    // Fetch device ID from name
     $.getJSON("http://@Model.ApiServer/api/device/@Model.Device", function(data){
         $("#deviceId").text(data.deviceId);
 
+        // Fetch latest temperature data
         $.getJSON("http://@Model.ApiServer/api/temperature/GetLatestTemp/" + data.deviceId, function(latestTempData){
             $("#currenttemp").html(latestTempData.value + " @@ " + latestTempData.timestamp);
-        })
+        });
+
+        // Fetch 24 hour temperature data and load it into the chart
+        $.getJSON("http://@Model.ApiServer/api/temperature/GetLast24HourTemperatures/" + data.deviceId, function(last24hourData){
+            for (var i = 0; i < last24hourData.length; i++) {
+                chartdata.labels.push(last24hourData[i].hour);
+                chartdata.datasets[0].data.push(last24hourData[i].value);
+            }
+
+            var temperatureLineChart = new Chart(ctx, {
+                type: 'line',
+                data: chartdata
+            });
+
+            var min = last24hourData.reduce(function(prev, curr) {
+                return prev.value < curr.value ? prev : curr;
+            });
+
+            var max = last24hourData.reduce(function (prev, curr) {
+                return prev.value > curr.value ? prev : curr;
+            });
+
+            $("#mintemp").html(min.value + " @@ Hour " + min.hour);
+            $("#maxtemp").html(max.value + " @@ Hour " + max.hour);
+            $("#deltaT").html((max.value - min.value).toFixed(2));
+        });
     });
 </script>
