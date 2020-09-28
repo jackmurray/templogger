@@ -23,3 +23,12 @@ services:
         restart: unless-stopped
         tty: true
         stdin_open: false
+
+  dashboard:
+        ports:
+                - "5010:80"
+        image: temploggerdashboard
+        container_name: temploggerdashboard
+        restart: unless-stopped
+        tty: true
+        stdin_open: false
