@@ -48,16 +48,16 @@ Max temperature: <span id="maxtemp"></span><br />
     };
 
     // Fetch device ID from name
-    $.getJSON("http://@Model.ApiServer/api/device/@Model.Device", function(data){
+    $.getJSON("@Model.ApiServer/api/device/@Model.Device", function(data){
         $("#deviceId").text(data.deviceId);
 
         // Fetch latest temperature data
-        $.getJSON("http://@Model.ApiServer/api/temperature/GetLatestTemp/" + data.deviceId, function(latestTempData){
+        $.getJSON("@Model.ApiServer/api/temperature/GetLatestTemp/" + data.deviceId, function(latestTempData){
             $("#currenttemp").html(latestTempData.value + " @@ " + latestTempData.timestamp);
         });
 
         // Fetch 24 hour temperature data and load it into the chart
-        $.getJSON("http://@Model.ApiServer/api/temperature/GetLast24HourTemperatures/" + data.deviceId, function(last24hourData){
+        $.getJSON("@Model.ApiServer/api/temperature/GetLast24HourTemperatures/" + data.deviceId, function(last24hourData){
             for (var i = 0; i < last24hourData.length; i++) {
                 chartdata.labels.push(last24hourData[i].hour);
                 chartdata.datasets[0].data.push(last24hourData[i].value);
