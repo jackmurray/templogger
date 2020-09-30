@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace TempLoggerService.Dashboard
 {
@@ -29,8 +30,11 @@ namespace TempLoggerService.Dashboard
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            var apiserver = Configuration.GetSection("ApiServer").Value;
+            logger.LogInformation(String.Format("ApiServer = {0}", string.IsNullOrEmpty(apiserver) ? "<No Value>" : apiserver));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
