@@ -25,7 +25,7 @@ namespace TempLoggerService.Client
         {
             var services = new ServiceCollection();
 
-            services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://templogger.corp.c0rporation.com/TempLoggerService/")));
+            services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri(config.GetSection("ApiServer").Value)));
             //services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://localhost:11317")));
             services.AddSingleton<ITemperatureProvider, OneWireTemperatureProvider>();
             services.AddSingleton(config);

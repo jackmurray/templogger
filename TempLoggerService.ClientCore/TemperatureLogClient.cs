@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using TempLoggerService.Models;
+using TempLoggerService.ModelsCore;
 
 namespace TempLoggerService.ClientCore
 {
@@ -17,9 +17,7 @@ namespace TempLoggerService.ClientCore
         {
             _client = new HttpClient();
 
-            // New code:
             _client.BaseAddress = serviceEndpoint;
-            //client.BaseAddress = new Uri("http://localhost:11317/");
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _client.DefaultRequestHeaders.TransferEncodingChunked = false;
@@ -28,14 +26,14 @@ namespace TempLoggerService.ClientCore
         public async Task<Guid> GetDeviceGuidByName(string name)
         {
             Guid id = Guid.Empty;
-            HttpResponseMessage response = await _client.GetAsync(String.Format("api/device/{0}", name));
+            HttpResponseMessage response = await _client.GetAsync(String.Format("/api/device/{0}", name));
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                id = await CreateDevice(name);
+                id = (await CreateDevice(name)).DeviceId;
             }
             else if (response.StatusCode == HttpStatusCode.OK)
             {
-                id = await response.Content.ReadAsAsync<Guid>();
+                id = (await response.Content.ReadAsAsync<Device>()).DeviceId;
             }
             else
                 throw new Exception("Unable to fetch device GUID");
@@ -48,18 +46,17 @@ namespace TempLoggerService.ClientCore
 
         public async Task SetTemperature(Guid devID, decimal temperature)
         {
-            TempEntry n = new TempEntry()
+            var t = new Temperature()
             {
-                temp = temperature,
-                device = devID,
-                timestamp = DateTime.UtcNow
+                Value = temperature,
+                DeviceId = devID
             };
-            var stringContent = new StringContent(JsonConvert.SerializeObject(n), Encoding.UTF8, "application/json");
+            //var stringContent = new StringContent(JsonConvert.SerializeObject(t), Encoding.UTF8, "application/json");
             //for some reason, using PostAsJsonAsync here does not work. no content-length header is added and HttpClient uses chunked encoding which it seems
             //that ASP.NET can't deal with. Manually doing the JSON conversion fixes the problem...
-            //HttpResponseMessage postresp = client.PostAsJsonAsync("api/temperature/LogTemp", n).Result;
+            HttpResponseMessage postresp = await _client.PostAsJsonAsync("/api/temperature", t);
 
-            HttpResponseMessage postresp = await _client.PostAsync("api/temperature/LogTemp", stringContent);
+            //HttpResponseMessage postresp = await _client.PostAsync("api/temperature/LogTemp", stringContent);
             if (!postresp.IsSuccessStatusCode)
                 throw new Exception("Failed to log temperature.");
         }
@@ -69,13 +66,13 @@ namespace TempLoggerService.ClientCore
             await SetTemperature(await GetDeviceGuidByName(device), temperature);
         }
 
-        private async Task<Guid> CreateDevice(string name)
+        private async Task<Device> CreateDevice(string name)
         {
-            HttpResponseMessage createresp = await _client.PostAsJsonAsync("api/device/", name);
-            if (createresp.StatusCode != HttpStatusCode.OK)
+            HttpResponseMessage createresp = await _client.PostAsJsonAsync("/api/device", name);
+            if (createresp.StatusCode != HttpStatusCode.Created)
                 throw new Exception("Unable to create device: " + createresp.StatusCode);
             else
-                return await createresp.Content.ReadAsAsync<Guid>();
+                return await createresp.Content.ReadAsAsync<Device>();
         }
     }
 }
