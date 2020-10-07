@@ -35,13 +35,19 @@ namespace TempLoggerService.Api.Controllers
         [HttpGet("{deviceId:guid}")]
         public async Task<IActionResult> GetById(Guid deviceId)
         {
-            return Ok(await _repo.GetAsync(deviceId));
+            var device = await _repo.GetAsync(deviceId);
+            if (device == null)
+                return NotFound();
+            else return Ok(device);
         }
 
         [HttpGet("{deviceName}")]
         public async Task<IActionResult> GetByName(string deviceName)
         {
-            return Ok(await _repo.GetAsync(deviceName));
+            var device = await _repo.GetAsync(deviceName);
+            if (device == null)
+                return NotFound();
+            else return Ok(device);
         }
 
         [HttpPost]
