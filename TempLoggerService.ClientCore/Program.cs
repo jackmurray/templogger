@@ -13,19 +13,36 @@ namespace TempLoggerService.Client
         private static ITemperatureLogClient _client;
         private static IServiceProvider serviceProvider;
         private static IConfiguration config;
+        private static string HostingEnvironment;
 
         private static void Configuration()
         {
+            var env_var = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (env_var != null)
+            {
+                HostingEnvironment = env_var;
+            }
+            else if (System.Diagnostics.Debugger.IsAttached)
+            {
+                HostingEnvironment = "Development";
+            }
+            else
+            {
+                HostingEnvironment = "Production";
+            }
             config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile($"appsettings.{HostingEnvironment}.json", optional: true, reloadOnChange: true)
                 .Build();
         }
 
         private static void ConfigureServices()
         {
             var services = new ServiceCollection();
+            var apiServer = config.GetSection("ApiServer").Value;
+            Console.WriteLine(apiServer);
 
-            services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri(config.GetSection("ApiServer").Value)));
+            services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri(apiServer)));
             //services.AddSingleton<ITemperatureLogClient>(new TemperatureLogClient(new Uri("http://localhost:11317")));
             services.AddSingleton<ITemperatureProvider, OneWireTemperatureProvider>();
             services.AddSingleton(config);
