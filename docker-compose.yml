@@ -14,20 +14,26 @@ services:
         stdin_open: false
 
   api:
+        build:
+            context: .
+            dockerfile: TempLoggerService.Dashboard.Dockerfile
         ports:
                 - "5000:80"
         environment:
             ConnectionStrings__Database: "Data Source=sqlserver;Initial Catalog=TemperatureLog;User ID=sa;Password=Testing123;"
-        image: temploggerapi
+        image: temploggerapi:latest
         container_name: temploggerapi
         restart: unless-stopped
         tty: true
         stdin_open: false
 
   dashboard:
+        build:
+            context: .
+            dockerfile: TempLoggerService.Api.Dockerfile
         ports:
                 - "5010:80"
-        image: temploggerdashboard
+        image: temploggerdashboard:latest
         container_name: temploggerdashboard
         restart: unless-stopped
         tty: true
