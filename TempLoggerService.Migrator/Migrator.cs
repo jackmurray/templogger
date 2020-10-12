@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Data.SqlClient;
+using TempLoggerService.ModelsCore;
+using System.Collections.Generic;
 
 namespace TempLoggerService.Migrator
 {
@@ -48,7 +50,7 @@ namespace TempLoggerService.Migrator
 
         public async Task ValidateSourceAsync()
         {
-            if (!await ValidateTableRowCount(_sourceConnection, "dbo.devices", ExpectedRowCount.AtLeastOne) ||
+            if (!await ValidateTableRowCount(_sourceConnection, "dbo.device", ExpectedRowCount.AtLeastOne) ||
                 !await ValidateTableRowCount(_sourceConnection, "dbo.temperature", ExpectedRowCount.AtLeastOne))
             {
                 throw new FormatException("Source database failed validation. Devices and Temperature tables must contain data.");
@@ -59,7 +61,7 @@ namespace TempLoggerService.Migrator
         public async Task ValidateDestinationAsync()
         {
             if (!await ValidateTableRowCount(_destinationConnection, "dbo.devices", ExpectedRowCount.Zero) ||
-                !await ValidateTableRowCount(_destinationConnection, "dbo.temperature", ExpectedRowCount.Zero))
+                !await ValidateTableRowCount(_destinationConnection, "dbo.temperatures", ExpectedRowCount.Zero))
             {
                 throw new FormatException("Destination database failed validation. Devices and Temperature tables must be empty.");
             }
@@ -68,15 +70,50 @@ namespace TempLoggerService.Migrator
 
         public async Task MigrateDevicesAsync()
         {
-            string getDevicesQuery = "SELECT * FROM dbo.devices";
+            string getDevicesQuery = "SELECT * FROM dbo.device ORDER BY deviceName ASC";
+            var sourceDevicesList = new List<Device>();
             using (SqlCommand cmd = new SqlCommand(getDevicesQuery, _sourceConnection))
             {
                 using (var sourceDevices = await cmd.ExecuteReaderAsync())
                 {
                     while (await sourceDevices.ReadAsync())
                     {
-                        _logger.LogInformation("Device ID {0}, Name {1}", sourceDevices.GetGuid(0), sourceDevices.GetString(1));
+                        Device d = new Device() { DeviceId = sourceDevices.GetGuid(0), DeviceName = sourceDevices.GetString(1) };
+                        _logger.LogInformation("Found device ID {0}, Name {1}", d.DeviceId, d.DeviceName);
+                        sourceDevicesList.Add(d);
                     }
+                }
+            }
+            _logger.LogInformation("Inserting {0} devices into the destination database", sourceDevicesList.Count);
+
+            using (var trans = await _destinationConnection.BeginTransactionAsync(CancellationToken) as SqlTransaction)
+            {
+                try
+                {
+                    using (var command = _destinationConnection.CreateCommand())
+                    {
+                        string insertDeviceQuery = "INSERT INTO dbo.devices (DeviceId, DeviceName) VALUES (@devId, @devName)";
+                        command.CommandText = insertDeviceQuery;
+                        command.Transaction = trans;
+                        command.Connection = _destinationConnection;
+                        command.Prepare();
+
+                        foreach (Device d in sourceDevicesList)
+                        {
+                            command.Parameters.AddWithValue("@devId", d.DeviceId);
+                            command.Parameters.AddWithValue("@devName", d.DeviceName);
+                            await command.ExecuteNonQueryAsync(CancellationToken);
+                            command.Parameters.Clear();
+                        }
+                    }
+
+                    await trans.CommitAsync(CancellationToken);
+                    _logger.LogInformation("Device migration complete.");
+                }
+                catch
+                {
+                    await trans.RollbackAsync();
+                    throw;
                 }
             }
         }
