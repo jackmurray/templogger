@@ -1,5 +1,4 @@
 using System;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -10,25 +9,36 @@ namespace TempLoggerService.Migrator
 {
     public class MigratorService : IHostedService
     {
-        private string _sourceConnectionString;
-        private string _destinationConnectionString;
-        private ILogger<MigratorService> _logger;
         
-        public MigratorService(ILogger<MigratorService> logger, IConfiguration config)
+        private ILogger<MigratorService> _logger;
+        private Migrator _migrator;
+        
+        public MigratorService(ILogger<MigratorService> logger, ILogger<Migrator> migratorlogger, IConfiguration config)
         {
             _logger = logger;
-            _sourceConnectionString = config.GetSection("ConnectionStrings").GetSection("Source").Value;
-            _destinationConnectionString = config.GetSection("ConnectionStrings").GetSection("Destination").Value;
+            string _sourceConnectionString = config.GetSection("ConnectionStrings").GetSection("Source").Value;
+            string _destinationConnectionString = config.GetSection("ConnectionStrings").GetSection("Destination").Value;
+            _migrator = new Migrator(migratorlogger, _sourceConnectionString, _destinationConnectionString);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            _logger.LogInformation("MigratorService starting");
+            _migrator.CancellationToken = cancellationToken;
+            await _migrator.ConnectAsync();
+            await _migrator.ValidateSourceAsync();
+            await _migrator.ValidateDestinationAsync();
+            await _migrator.MigrateDevicesAsync();
+            while (!cancellationToken.IsCancellationRequested && !_migrator.IsFinished)
+            {
+                await _migrator.MigrateTemperatureBatchAsync(1000);
+            }
+            return;
         }
  
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

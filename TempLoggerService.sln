@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.Api", "Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.Dashboard", "TempLoggerService.Dashboard\TempLoggerService.Dashboard.csproj", "{A02F38D5-1BF3-4D49-B6E7-5943CC6DAE94}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempLoggerService.Migrator", "TempLoggerService.Migrator\TempLoggerService.Migrator.csproj", "{fcc0738a-9d4a-4267-a2cd-3bd02aa6f1d8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{A02F38D5-1BF3-4D49-B6E7-5943CC6DAE94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A02F38D5-1BF3-4D49-B6E7-5943CC6DAE94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A02F38D5-1BF3-4D49-B6E7-5943CC6DAE94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{fcc0738a-9d4a-4267-a2cd-3bd02aa6f1d8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{fcc0738a-9d4a-4267-a2cd-3bd02aa6f1d8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{fcc0738a-9d4a-4267-a2cd-3bd02aa6f1d8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{fcc0738a-9d4a-4267-a2cd-3bd02aa6f1d8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
