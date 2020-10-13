@@ -125,12 +125,17 @@ namespace TempLoggerService.Migrator
 
         private async Task<bool> ValidateTableRowCount(SqlConnection connection, string tableName, ExpectedRowCount expectedRowCount)
         {
+            int rowCount = await GetTableRowCount(connection, tableName);
+            return (expectedRowCount == ExpectedRowCount.Zero && rowCount == 0 ||
+                    expectedRowCount == ExpectedRowCount.AtLeastOne && rowCount >= 1);
+        }
+
+        private async Task<int> GetTableRowCount(SqlConnection connection, string tableName)
+        {
             string querySql = "SELECT COUNT(*) FROM " + tableName;
             using (SqlCommand cmd = new SqlCommand(querySql, connection))
             {
-                int rowCount = (int)await cmd.ExecuteScalarAsync();
-                return (expectedRowCount == ExpectedRowCount.Zero && rowCount == 0 ||
-                        expectedRowCount == ExpectedRowCount.AtLeastOne && rowCount >= 1);
+                return (int)await cmd.ExecuteScalarAsync();
             }
         }
     }
