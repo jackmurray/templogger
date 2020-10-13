@@ -20,13 +20,9 @@ namespace TempLoggerService.Migrator
         private string _sourceConnectionString;
         private string _destinationConnectionString;
 
-        private bool _isDeviceMigrationFinished;
-        private bool _isTemperatureMigrationFinished;
-
         private SqlConnection _sourceConnection;
         private SqlConnection _destinationConnection;
 
-        public bool IsFinished { get { return _isDeviceMigrationFinished && _isTemperatureMigrationFinished; } }
 
         public CancellationToken CancellationToken {get; set;}
 
@@ -35,8 +31,6 @@ namespace TempLoggerService.Migrator
             _logger = logger;
             _sourceConnectionString = sourceConnectionString;
             _destinationConnectionString = destinationConnectionString;
-            _isDeviceMigrationFinished = false;
-            _isTemperatureMigrationFinished = false;
         }
 
         public async Task ConnectAsync()
@@ -118,9 +112,81 @@ namespace TempLoggerService.Migrator
             }
         }
 
-        public async Task MigrateTemperatureBatchAsync(int batchSize)
+        public async Task MigrateTemperaturesAsync(int batchSize)
         {
-            throw new NotImplementedException();
+            string getTemperaturesQuery = "SELECT * FROM dbo.temperature ORDER BY timestamp ASC";
+            var temperatureBatch = new List<Temperature>(batchSize); //might as well re-use the model class to store the results.
+            int remainingRowCount = await GetTableRowCount(_sourceConnection, "dbo.temperature");
+            _logger.LogInformation("Migrating {0} temperature records", remainingRowCount);
+            using (SqlCommand cmd = new SqlCommand(getTemperaturesQuery, _sourceConnection))
+            {
+                cmd.CommandTimeout = 120; // need a longer timeout because sorting the temperatures by timestamp can be slow
+                using (var temperatureReader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await temperatureReader.ReadAsync())
+                    {
+                        temperatureBatch.Add(new Temperature()
+                        {
+                            DeviceId = temperatureReader.GetGuid(0),
+                            Timestamp = temperatureReader.GetDateTime(1),
+                            Value = temperatureReader.GetDecimal(2)
+                        });
+
+                        // If we have filled a batch, then migrate it and start over.
+                        if (temperatureBatch.Count == batchSize)
+                        {
+                            await MigrateTemperatureBatchAsync(temperatureBatch);
+                            temperatureBatch.Clear();
+                            remainingRowCount -= batchSize;
+                            _logger.LogInformation("{0} temperature records remaining.", remainingRowCount);
+                        }
+                    }
+
+                    // If there's a partial batch left at the end (i.e. there weren't an exact multiple of batchSize records)
+                    // then migrate those. No need to clear the batch as it'll go out of scope anyway.
+                    if (temperatureBatch.Count > 0)
+                    {
+                        await MigrateTemperatureBatchAsync(temperatureBatch);
+                    }
+
+                    _logger.LogInformation("All temperature records migrated.");
+                }
+            }
+        }
+
+        private async Task MigrateTemperatureBatchAsync(List<Temperature> temperatureBatch)
+        {
+            using (var trans = await _destinationConnection.BeginTransactionAsync(CancellationToken) as SqlTransaction)
+            {
+                try
+                {
+                    using (var command = _destinationConnection.CreateCommand())
+                    {
+                        string insertTemperatureQuery = "INSERT INTO dbo.Temperatures (DeviceId, Timestamp, Value) VALUES (@devId, @timestamp, @value)";
+                        command.CommandText = insertTemperatureQuery;
+                        command.Transaction = trans;
+                        command.Connection = _destinationConnection;
+                        command.Prepare();
+
+                        foreach (Temperature t in temperatureBatch)
+                        {
+                            command.Parameters.AddWithValue("@devId", t.DeviceId);
+                            command.Parameters.AddWithValue("@timestamp", t.Timestamp);
+                            command.Parameters.AddWithValue("@value", t.Value);
+
+                            await command.ExecuteNonQueryAsync(CancellationToken);
+                            command.Parameters.Clear();
+                        }
+                    }
+
+                    await trans.CommitAsync(CancellationToken);
+                }
+                catch
+                {
+                    await trans.RollbackAsync();
+                    throw;
+                }
+            }
         }
 
         private async Task<bool> ValidateTableRowCount(SqlConnection connection, string tableName, ExpectedRowCount expectedRowCount)

@@ -29,10 +29,8 @@ namespace TempLoggerService.Migrator
             await _migrator.ValidateSourceAsync();
             await _migrator.ValidateDestinationAsync();
             await _migrator.MigrateDevicesAsync();
-            while (!cancellationToken.IsCancellationRequested && !_migrator.IsFinished)
-            {
-                await _migrator.MigrateTemperatureBatchAsync(1000);
-            }
+            await _migrator.MigrateTemperaturesAsync(batchSize: 10000);
+
             return;
         }
  
