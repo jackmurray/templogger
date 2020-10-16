@@ -162,20 +162,12 @@ namespace TempLoggerService.Migrator
                 {
                     using (var command = _destinationConnection.CreateCommand())
                     {
-                        string insertTemperatureQuery = "INSERT INTO dbo.Temperatures (DeviceId, Timestamp, Value) VALUES (@devId, @timestamp, @value)";
-                        command.CommandText = insertTemperatureQuery;
                         command.Transaction = trans;
                         command.Connection = _destinationConnection;
-                        command.Prepare();
 
                         foreach (Temperature t in temperatureBatch)
                         {
-                            command.Parameters.AddWithValue("@devId", t.DeviceId);
-                            command.Parameters.AddWithValue("@timestamp", t.Timestamp);
-                            command.Parameters.AddWithValue("@value", t.Value);
-
-                            await command.ExecuteNonQueryAsync(CancellationToken);
-                            command.Parameters.Clear();
+                            await InsertTemperatureData(command, t);
                         }
                     }
 
@@ -203,6 +195,23 @@ namespace TempLoggerService.Migrator
             {
                 return (int)await cmd.ExecuteScalarAsync();
             }
+        }
+
+        private async Task InsertTemperatureData(SqlCommand command, List<Temperature> temperatures)
+        {
+
+        }
+
+        private async Task InsertTemperatureData(SqlCommand command, Temperature temperature)
+        {
+            const string insertTemperatureQuery = "INSERT INTO dbo.Temperatures (DeviceId, Timestamp, Value) VALUES (@devId, @timestamp, @value)";
+            command.CommandText = insertTemperatureQuery;
+            command.Parameters.AddWithValue("@devId", temperature.DeviceId);
+            command.Parameters.AddWithValue("@timestamp", temperature.Timestamp);
+            command.Parameters.AddWithValue("@value", temperature.Value);
+
+            await command.ExecuteNonQueryAsync(CancellationToken);
+            command.Parameters.Clear();
         }
     }
 }
