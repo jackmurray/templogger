@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Data.SqlClient;
 using TempLoggerService.ModelsCore;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TempLoggerService.Migrator
 {
@@ -16,6 +17,8 @@ namespace TempLoggerService.Migrator
 
     public class Migrator
     {
+        private const int MAX_INSERT_SIZE = 5;
+
         private ILogger<Migrator> _logger;
         private string _sourceConnectionString;
         private string _destinationConnectionString;
@@ -165,9 +168,24 @@ namespace TempLoggerService.Migrator
                         command.Transaction = trans;
                         command.Connection = _destinationConnection;
 
-                        foreach (Temperature t in temperatureBatch)
+                        int inserted = 0;
+
+                        while (inserted != temperatureBatch.Count)
                         {
-                            await InsertTemperatureData(command, t);
+                            int remaining = temperatureBatch.Count - inserted;
+                            if (remaining >= MAX_INSERT_SIZE) // if we have enough to insert a full group then do that
+                            {
+                                await InsertTemperatureData(command, temperatureBatch.Skip(inserted).Take(MAX_INSERT_SIZE).ToList());
+                                inserted += MAX_INSERT_SIZE;
+                            }
+                            else // if we can't fill a group then insert the remaining rows one at a time
+                            {
+                                foreach (Temperature t in temperatureBatch.Skip(inserted))
+                                {
+                                    await InsertTemperatureData(command, t);
+                                    inserted += 1;
+                                }
+                            }
                         }
                     }
 
@@ -199,7 +217,22 @@ namespace TempLoggerService.Migrator
 
         private async Task InsertTemperatureData(SqlCommand command, List<Temperature> temperatures)
         {
+            const string insertTemperatureQuery = "INSERT INTO dbo.Temperatures (DeviceId, Timestamp, Value) VALUES (@devId0, @timestamp0, @value0)," +
+                                                  "(@devId1, @timestamp1, @value1), (@devId2, @timestamp2, @value2), (@devId3, @timestamp3, @value3), (@devId4, @timestamp4, @value4)";
+            if (temperatures.Count != MAX_INSERT_SIZE)
+                throw new DataMisalignedException("Attempted to use group insert command with an invalid group size.");
 
+            command.CommandText = insertTemperatureQuery;
+            for (int i = 0; i < MAX_INSERT_SIZE; i++)
+            {
+                Temperature t = temperatures[i];
+                command.Parameters.AddWithValue($"@devId{i}", t.DeviceId);
+                command.Parameters.AddWithValue($"@timestamp{i}", t.Timestamp);
+                command.Parameters.AddWithValue($"@value{i}", t.Value);
+            }
+
+            await command.ExecuteNonQueryAsync(CancellationToken);
+            command.Parameters.Clear();
         }
 
         private async Task InsertTemperatureData(SqlCommand command, Temperature temperature)
