@@ -55,10 +55,10 @@ namespace TempLoggerService.Migrator
             _logger.LogInformation("Source database validated");
         }
 
-        public async Task ValidateDestinationAsync()
+        public async Task ValidateDestinationAsync(ExpectedRowCount expectedRowCount)
         {
-            if (!await ValidateTableRowCount(_destinationConnection, "dbo.devices", ExpectedRowCount.Zero) ||
-                !await ValidateTableRowCount(_destinationConnection, "dbo.temperatures", ExpectedRowCount.Zero))
+            if (!await ValidateTableRowCount(_destinationConnection, "dbo.devices", expectedRowCount) ||
+                !await ValidateTableRowCount(_destinationConnection, "dbo.temperatures", expectedRowCount))
             {
                 throw new FormatException("Destination database failed validation. Devices and Temperature tables must be empty.");
             }
@@ -115,15 +115,17 @@ namespace TempLoggerService.Migrator
             }
         }
 
-        public async Task MigrateTemperaturesAsync(int batchSize)
+        public async Task MigrateTemperaturesAsync(int batchSize, DateTime after)
         {
-            string getTemperaturesQuery = "SELECT * FROM dbo.temperature ORDER BY timestamp ASC";
+            string getTemperaturesQuery = "SELECT * FROM dbo.temperature WHERE timestamp > @after ORDER BY timestamp ASC";
             var temperatureBatch = new List<Temperature>(batchSize); //might as well re-use the model class to store the results.
             int remainingRowCount = await GetTableRowCount(_sourceConnection, "dbo.temperature");
             _logger.LogInformation("Migrating {0} temperature records", remainingRowCount);
             using (SqlCommand cmd = new SqlCommand(getTemperaturesQuery, _sourceConnection))
             {
                 cmd.CommandTimeout = 120; // need a longer timeout because sorting the temperatures by timestamp can be slow
+                cmd.Parameters.AddWithValue("@after", after);
+
                 using (var temperatureReader = await cmd.ExecuteReaderAsync())
                 {
                     while (await temperatureReader.ReadAsync())
@@ -153,6 +155,19 @@ namespace TempLoggerService.Migrator
                     }
 
                     _logger.LogInformation("All temperature records migrated.");
+                }
+            }
+        }
+
+        public async Task<DateTime> GetTimestampOfMostRecentTemperatureAsync()
+        {
+            string getMostRecentTemperatureQuery = "SELECT TOP 1 timestamp FROM dbo.Temperatures ORDER BY Timestamp DESC";
+            using (SqlCommand cmd = new SqlCommand(getMostRecentTemperatureQuery, _destinationConnection))
+            {
+                using (var temperatureReader = await cmd.ExecuteReaderAsync())
+                {
+                    await temperatureReader.ReadAsync();
+                    return temperatureReader.GetDateTime(0);
                 }
             }
         }
