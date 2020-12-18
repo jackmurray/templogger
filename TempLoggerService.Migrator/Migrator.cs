@@ -119,7 +119,7 @@ namespace TempLoggerService.Migrator
         {
             string getTemperaturesQuery = "SELECT * FROM dbo.temperature WHERE timestamp > @after ORDER BY timestamp ASC";
             var temperatureBatch = new List<Temperature>(batchSize); //might as well re-use the model class to store the results.
-            int remainingRowCount = await GetTableRowCount(_sourceConnection, "dbo.temperature");
+            int remainingRowCount = await GetTableRowCount(_sourceConnection, "dbo.temperature") - await GetTableRowCount(_destinationConnection, "dbo.Temperatures");
             _logger.LogInformation("Migrating {0} temperature records", remainingRowCount);
             using (SqlCommand cmd = new SqlCommand(getTemperaturesQuery, _sourceConnection))
             {
