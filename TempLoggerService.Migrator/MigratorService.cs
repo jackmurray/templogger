@@ -36,10 +36,14 @@ namespace TempLoggerService.Migrator
             _logger.LogInformation("MigratorService starting");
             _migrator.CancellationToken = cancellationToken;
             await _migrator.ConnectAsync();
-            await _migrator.ValidateSourceAsync();
+            Task sourceValidateTask = _migrator.ValidateSourceAsync();
             // If we're doing a full migration then we need the destination to be empty. Incremental migration requires
             // there to already be data present that we can add to.
-            await _migrator.ValidateDestinationAsync(_mode == MigratorServiceMode.Full ? ExpectedRowCount.Zero : ExpectedRowCount.AtLeastOne);
+            Task destinationValidateTask = _migrator.ValidateDestinationAsync(_mode == MigratorServiceMode.Full ? ExpectedRowCount.Zero : ExpectedRowCount.AtLeastOne);
+
+            await sourceValidateTask;
+            await destinationValidateTask;
+
             if (_mode == MigratorServiceMode.Full) // No need to do this on an incremental migration.
                 await _migrator.MigrateDevicesAsync();
 
