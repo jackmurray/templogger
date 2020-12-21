@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the API image
+      run: docker build -f TempLoggerService.Api.Dockerfile . -t temploggerapi:$(date +%s)
+    - name: Build the Dashboard image
+      run: docker build -f TempLoggerService.Dashboard.Dockerfile . -t temploggerdashboard:$(date +%s)
