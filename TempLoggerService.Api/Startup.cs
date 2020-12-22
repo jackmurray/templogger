@@ -32,6 +32,8 @@ namespace TempLoggerService.Api
             var connectionString = Configuration.GetConnectionString("Database");
             services.AddDbContext<ApiContext>(options => options.UseSqlServer(connectionString));
 
+            string dashboardServer = Configuration.GetSection("DashboardServer").Value;
+
             services.AddScoped<ITemperatureRepository, TemperatureRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
 
@@ -40,10 +42,18 @@ namespace TempLoggerService.Api
                     builder.AllowAnyOrigin();
                 });
 
-                options.AddPolicy("prod", builder => {
+                options.AddPolicy("local", builder => {
                     // Allow the prod API to accept requests from a dev frontend
                     builder.WithOrigins("http://localhost:5010");
                 });
+
+                if (!string.IsNullOrWhiteSpace(dashboardServer))
+                {
+                    options.AddPolicy("prod", builder => {
+                        // Allow the API to accept requests from the configured dashboard server.
+                        builder.WithOrigins(dashboardServer);
+                    });
+                }
             });
         }
 
