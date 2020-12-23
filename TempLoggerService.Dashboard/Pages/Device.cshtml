@@ -13,8 +13,6 @@
 <form action="">
     <select id="SelectDevice">
         <option></option>
-        <option>rpi1</option>
-        <option>testdevice3</option>
     </select>
 </form>
 
@@ -33,6 +31,15 @@ Max temperature: <span id="maxtemp"></span><br />
 <canvas id="temperatureChart" width="800" height="400"></canvas>
 
 <script type="text/javascript">
+
+    // Fetch all devices
+    $.getJSON("@Model.ApiServer/api/device", function (data) {
+        for (var i in data.devices)
+        {
+            var dev = data.devices[i];
+            $("#SelectDevice").append(new Option(dev.deviceName, dev.deviceName));
+        }
+    });
     // Chart setup
     var ctx = document.getElementById("temperatureChart").getContext("2d");
     var chartdata = { labels: [], datasets: [{

@@ -19,7 +19,7 @@ namespace TempLoggerService.Api.Repositories
 
         public async Task<IEnumerable<Device>> GetAsync()
         {
-            return await _context.Devices.ToListAsync();
+            return (await _context.Devices.ToListAsync()).OrderBy(d => d.DeviceName);
         }
 
         public async Task<Device> GetAsync(Guid deviceId)
