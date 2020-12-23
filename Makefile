@@ -1,10 +1,6 @@
-all: api dashboard
+all: build
 
-api:
-	sudo docker build -f TempLoggerService.Dashboard.Dockerfile . -t templogger:dashboard
-
-dashboard:
-	sudo docker build -f TempLoggerService.Api.Dockerfile . -t templogger:api
-
+build:
+	sudo pwsh Run-CI.ps1 -Mode Build
 up:
 	sudo docker-compose up -d
