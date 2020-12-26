@@ -32,6 +32,12 @@ namespace TempLoggerService.Dashboard
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            // If the URL contains /templogger, then this makes the ASP.NET middleware prefix all generated
+            // URLs with it. This makes the app work correctly behind a reverse proxy (when hosting it at
+            // a non-root URL) as well as locally for debugging.
+            // TODO: Make this configurable.
+            app.UsePathBase("/templogger");
+
             var apiserver = Configuration.GetSection("ApiServer").Value;
             logger.LogInformation(String.Format("ApiServer = {0}", string.IsNullOrEmpty(apiserver) ? "<No Value>" : apiserver));
 
