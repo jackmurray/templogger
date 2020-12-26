@@ -26,7 +26,7 @@ namespace TempLoggerService.ClientCore
         public async Task<Guid> GetDeviceGuidByName(string name)
         {
             Guid id = Guid.Empty;
-            HttpResponseMessage response = await _client.GetAsync(String.Format("/api/device/{0}", name));
+            HttpResponseMessage response = await _client.GetAsync(String.Format("api/device/{0}", name));
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 id = (await CreateDevice(name)).DeviceId;
@@ -54,7 +54,7 @@ namespace TempLoggerService.ClientCore
             //var stringContent = new StringContent(JsonConvert.SerializeObject(t), Encoding.UTF8, "application/json");
             //for some reason, using PostAsJsonAsync here does not work. no content-length header is added and HttpClient uses chunked encoding which it seems
             //that ASP.NET can't deal with. Manually doing the JSON conversion fixes the problem...
-            HttpResponseMessage postresp = await _client.PostAsJsonAsync("/api/temperature", t);
+            HttpResponseMessage postresp = await _client.PostAsJsonAsync("api/temperature", t);
 
             //HttpResponseMessage postresp = await _client.PostAsync("api/temperature/LogTemp", stringContent);
             if (!postresp.IsSuccessStatusCode)
@@ -68,7 +68,7 @@ namespace TempLoggerService.ClientCore
 
         private async Task<Device> CreateDevice(string name)
         {
-            HttpResponseMessage createresp = await _client.PostAsJsonAsync("/api/device", name);
+            HttpResponseMessage createresp = await _client.PostAsJsonAsync("api/device", name);
             if (createresp.StatusCode != HttpStatusCode.Created)
                 throw new Exception("Unable to create device: " + createresp.StatusCode);
             else
