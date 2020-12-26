@@ -18,7 +18,9 @@
 
 <script type="text/javascript">
     $("#SelectDevice").change(function () {
-        window.location.href = "/Device/" + $("#SelectDevice :selected").text()
+        var appBasePath = window.location.href.replace(/\/Device\/.+/, ""); //strip off the current device path, if there is one.
+
+        window.location.href = appBasePath + "/Device/" + $("#SelectDevice :selected").text()
     });
 </script>
 
