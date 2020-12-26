@@ -6,7 +6,7 @@ After=network.service
 Type=simple
 ExecStartPre=/sbin/modprobe w1-gpio
 ExecStartPre=/sbin/modprobe w1-therm
-ExecStart=/usr/local/bin/mono /root/temploggerclient/TempLoggerService.Client.exe
+ExecStart=/root/TempLoggerService.ClientCore/TempLoggerService.ClientCore
 
 [Install]
 WantedBy=multi-user.target
