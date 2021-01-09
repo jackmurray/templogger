@@ -4,3 +4,8 @@
 /packages
 .vs
 /TempLoggerService/Properties/PublishProfiles/*
+/**/*.csproj.user
+
+# Ignore this so that the password can be changed from the dummy value for testing without
+# risking accidentally committing it.
+/TempLoggerService.Api/appsettings.Development.json
